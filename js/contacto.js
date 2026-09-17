@@ -24,11 +24,11 @@ function enviarContacto() {
       return respuesta.json();
     })
     .then(function (data) {
-      console.log("[Climaxer] Respuesta del servidor:", data);
+      console.log("[Agromatical] Respuesta del servidor:", data);
       estado.innerText = "¡Mensaje enviado! Gracias " + nombre + ".";
     })
     .catch(function (error) {
-      console.error("[Climaxer] Error al enviar el contacto:", error);
+      console.error("[Agromatical] Error al enviar el contacto:", error);
       estado.innerText = "No se pudo enviar. Probá de nuevo más tarde.";
     });
 }

@@ -1,4 +1,4 @@
-var SYSTEM_PROMPT_BASE = "Sos el asistente de Climaxer (Agromatical), un sistema de monitoreo de " +
+var SYSTEM_PROMPT_BASE = "Sos AgrIA, el asistente de Agromatical, un sistema de monitoreo de " +
   "temperatura y humedad para agricultores. Respondés dudas sobre riego, cuidado de " +
   "cultivos, y cómo interpretar la temperatura y humedad que muestra la página. " +
   "Sos claro y breve (unos pocos párrafos como mucho), y si no estás seguro de algo " +
@@ -54,7 +54,7 @@ var iaEstaPensando = false;
 
 function preguntarAlAsistente(mensajes) {
   if (!AI_CONFIG.endpoint) {
-    console.warn("[Climaxer] Falta configurar AI_CONFIG.endpoint en js/asistente-ia.js");
+    console.warn("[AgrIA] Falta configurar AI_CONFIG.endpoint en js/asistente-ia.js");
     return Promise.resolve("El asistente todavía no está conectado.");
   }
 
@@ -76,7 +76,7 @@ function preguntarAlAsistente(mensajes) {
       return "Hubo un error consultando al asistente.";
     })
     .catch(function (error) {
-      console.error("[Climaxer] Error al consultar el asistente:", error);
+      console.error("[AgrIA] Error al consultar el asistente:", error);
       return "Hubo un error consultando al asistente. Revisá la conexión e intentá de nuevo.";
     });
 }

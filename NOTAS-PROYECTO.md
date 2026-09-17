@@ -1,4 +1,4 @@
-# Notas del proyecto — Climaxer / Agromatical
+# Notas del proyecto — Agromatical
 
 Este archivo es solo para el equipo (no se linkea desde ninguna página). Resume en qué quedó todo y qué falta.
 
