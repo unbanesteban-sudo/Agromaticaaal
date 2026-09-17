@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Climaxer — Pronóstico del tiempo</title>
+  <meta name="description" content="Climaxer, proyecto académico de pronóstico del tiempo.">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+</head>
+<body>
+
+  <header class="site-header">
+    <div class="container header-bar">
+      <a href="index.html" class="brand">
+        <span class="brand-icon" aria-hidden="true">
+          <svg width="30" height="30" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="8" cy="8" r="4" fill="currentColor" opacity="0.85"/>
+            <path d="M7 17a4 4 0 0 1 0-8 5.5 5.5 0 0 1 10.8 1.2A3.7 3.7 0 0 1 17 17H7Z" fill="currentColor"/>
+          </svg>
+        </span>
+        <span class="brand-name">Climaxer</span>
+      </a>
+
+      <button type="button" class="nav-toggle" onclick="toggleMenu()" aria-label="Abrir menú">
+        <span></span><span></span><span></span>
+      </button>
+
+      <nav class="main-nav" id="mainNav">
+        <ul>
+          <li><a href="index.html" class="active">Inicio</a></li>
+          <li><a href="pronostico.html">Pronóstico</a></li>
+          <li><a href="mapa.html">Mapa</a></li>
+          <li><a href="nosotros.html">Nosotros</a></li>
+          <li><a href="contacto.html">Contacto</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero">
+      <div class="container">
+        <div class="hero-top">
+          <h1 class="hero-title">¿Qué tiempo hace en tu zona?</h1>
+          <div class="search-form">
+            <input type="text" id="citySearchInput" placeholder="Buscar ciudad..." autocomplete="off">
+            <button type="button" onclick="buscarClima()">Buscar</button>
+          </div>
+        </div>
+
+        <div class="hero-grid">
+          <div class="weather-card" id="weatherCard">
+            <div class="weather-card-main">
+              <div class="weather-icon" id="weatherIcon" aria-hidden="true">
+                <svg width="34" height="34" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M7 17a4 4 0 0 1 0-8 5.5 5.5 0 0 1 10.8 1.2A3.7 3.7 0 0 1 17 17H7Z" fill="currentColor"/>
+                </svg>
+              </div>
+              <div>
+                <div class="weather-location" id="weatherLocation">Cutral Có</div>
+                <div class="weather-temp"><span id="weatherTemp">--</span></div>
+                <div class="weather-desc" id="weatherDesc">Buscando datos...</div>
+              </div>
+            </div>
+
+            <div class="weather-details">
+              <div class="weather-detail"><span>Humedad</span><strong><span id="weatherHumedad">--</span>%</strong></div>
+              <div class="weather-detail"><span>Presión</span><strong><span id="weatherPresion">--</span> hPa</strong></div>
+              <div class="weather-detail"><span>Viento</span><strong><span id="weatherViento">--</span> km/h</strong></div>
+              <div class="weather-detail"><span>Visibilidad</span><strong><span id="weatherVisibilidad">--</span> km</strong></div>
+            </div>
+
+            <div class="weather-state">
+              <span id="weatherEstado">Buscando tu ubicación...</span>
+              · Actualizado: <span id="weatherUpdated">--</span>
+            </div>
+          </div>
+
+          <div class="map-card">
+            <div class="map-leaflet" id="mapaHero"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="container">
+        <h2 class="section-title">Accesos rápidos</h2>
+        <div class="quick-links">
+          <a class="quick-link-card" href="pronostico.html">
+            <div class="quick-link-icon">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M7 17a4 4 0 0 1 0-8 5.5 5.5 0 0 1 10.8 1.2A3.7 3.7 0 0 1 17 17H7Z" fill="currentColor"/></svg>
+            </div>
+            <h3>Pronóstico extendido</h3>
+            <p>Próximos días para Cutral Có (en preparación).</p>
+          </a>
+
+          <a class="quick-link-card" href="mapa.html">
+            <div class="quick-link-icon">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 2c-4 0-7 3.1-7 7 0 5.2 7 13 7 13s7-7.8 7-13c0-3.9-3-7-7-7Zm0 9.5A2.5 2.5 0 1 1 12 6a2.5 2.5 0 0 1 0 5.5Z" fill="currentColor"/></svg>
+            </div>
+            <h3>Mapa interactivo</h3>
+            <p>Ubicación y temperatura en tiempo real (Open-Meteo).</p>
+          </a>
+
+          <a class="quick-link-card" href="#" data-pending="true">
+            <div class="quick-link-icon">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 2a6 6 0 0 0-6 6v3.3L4 15v1h16v-1l-2-3.7V8a6 6 0 0 0-6-6Zm0 20a2.5 2.5 0 0 0 2.45-2h-4.9A2.5 2.5 0 0 0 12 22Z" fill="currentColor"/></svg>
+            </div>
+            <h3>Alertas</h3>
+            <p>Avisos por temperatura o humedad extrema (a futuro).</p>
+          </a>
+
+          <a class="quick-link-card" href="#" data-pending="true">
+            <div class="quick-link-icon">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M4 20V10h3v10H4Zm6.5 0V4h3v16h-3ZM17 20v-7h3v7h-3Z" fill="currentColor"/></svg>
+            </div>
+            <h3>Estadísticas</h3>
+            <p>Historial de mediciones (a futuro).</p>
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" style="padding-top:0;">
+      <div class="container">
+        <h2 class="section-title">Novedades del proyecto</h2>
+        <div class="updates-grid">
+          <article class="update-card">
+            <div class="update-card-media"></div>
+            <div class="update-card-body">
+              <time>Etapa 1</time>
+              <h3>Estructura del sitio y diseño base</h3>
+            </div>
+          </article>
+          <article class="update-card">
+            <div class="update-card-media"></div>
+            <div class="update-card-body">
+              <time>Etapa 2</time>
+              <h3>Conexión con la API de clima (Open-Meteo)</h3>
+            </div>
+          </article>
+          <article class="update-card">
+            <div class="update-card-media"></div>
+            <div class="update-card-body">
+              <time>Etapa 3</time>
+              <h3>Mapa, alertas y asistente de ayuda</h3>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-top">
+      <div class="footer-brand">
+        <span class="brand-icon" aria-hidden="true">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="8" cy="8" r="4" fill="currentColor" opacity="0.85"/>
+            <path d="M7 17a4 4 0 0 1 0-8 5.5 5.5 0 0 1 10.8 1.2A3.7 3.7 0 0 1 17 17H7Z" fill="currentColor"/>
+          </svg>
+        </span>
+        <span class="brand-name">Climaxer</span>
+      </div>
+      <p class="footer-tagline">Proyecto académico de pronóstico del tiempo.</p>
+    </div>
+
+    <div class="container footer-grid">
+      <div class="footer-col">
+        <h5>Navegación</h5>
+        <ul>
+          <li><a href="index.html">Inicio</a></li>
+          <li><a href="pronostico.html">Pronóstico</a></li>
+          <li><a href="mapa.html">Mapa</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h5>Sobre el proyecto</h5>
+        <ul>
+          <li><a href="nosotros.html">Nosotros</a></li>
+          <li><a href="contacto.html">Contacto</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h5>Datos</h5>
+        <ul>
+          <li><span class="footer-note">Fuente: Open-Meteo (API pública)</span></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="container footer-bottom">
+      <p>&copy; <span id="footerYear"></span> Climaxer</p>
+    </div>
+  </footer>
+
+  <div class="ia-widget">
+    <button type="button" class="ia-widget-toggle" onclick="toggleAsistenteIA()" aria-label="Abrir asistente de IA">
+      <svg width="26" height="26" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M4 4h16v11H7l-3 3V4Z" fill="currentColor"/>
+      </svg>
+    </button>
+
+    <div class="ia-panel" id="iaPanel">
+      <div class="ia-panel-header">
+        <span>Asistente para agricultores</span>
+        <button type="button" class="ia-panel-close" onclick="toggleAsistenteIA()" aria-label="Cerrar asistente">&times;</button>
+      </div>
+
+      <p class="ia-panel-intro">Preguntale sobre riego, cuidado de cultivos, o cómo interpretar la temperatura y humedad de la página.</p>
+
+      <div class="ia-mensajes" id="iaMensajes"></div>
+
+      <div class="ia-panel-form">
+        <input type="text" id="iaInput" placeholder="Escribí tu pregunta..." autocomplete="off" onkeypress="manejarTeclaIA(event)">
+        <button type="button" onclick="enviarMensajeIA()">Enviar</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    document.getElementById("footerYear").innerText = new Date().getFullYear();
+  </script>
+
+  <script src="js/main.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/asistente-ia.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+  <script src="js/mapa.js"></script>
+  <script>
+    iniciarMapa("mapaHero", 13);
+  </script>
+</body>
+</html>
