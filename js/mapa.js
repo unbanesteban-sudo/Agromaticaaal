@@ -1,26 +1,9 @@
-// ---------------------------------------------------------------
-// Mapa interactivo con Leaflet
-// ---------------------------------------------------------------
-// Leaflet es una librería de mapas gratuita y de código abierto, no
-// pide api key ni cuenta. Usa como base los mapas de OpenStreetMap
-// (también gratis). Se usa en el mapa chico de index.html y en el
-// mapa grande de mapa.html.
-//
-// El marcador ya no queda fijo en un solo lugar: js/api.js lo mueve
-// a la ubicación que se está mostrando (la detectada por IP, o la
-// que se busque a mano) y le cambia el color según la temperatura
-// real que llega de Open-Meteo.
-
-// Ubicación inicial, antes de que llegue el primer dato real
-// (Cutral Có, Neuquén).
 var UBICACION_INICIAL = {
   lat: -38.9333,
   lng: -69.2167,
   nombre: "Cutral Có"
 };
 
-// A partir de qué temperatura se considera "frío" o "caluroso".
-// Ajustable según la zona.
 var TEMP_LIMITE_FRIO = 10;
 var TEMP_LIMITE_CALOR = 28;
 
@@ -29,8 +12,6 @@ var marcadorClimaMapa = null;
 var nombreUbicacionActual = UBICACION_INICIAL.nombre;
 var etiquetaTemperaturaActual = "Esperando datos...";
 
-// Devuelve { color, etiqueta } según la temperatura. Si no hay dato
-// todavía (null/undefined), devuelve un gris neutro.
 function estiloSegunTemperatura(temperatura) {
   if (temperatura === null || temperatura === undefined || isNaN(temperatura)) {
     return { color: "#9e9e9e", etiqueta: "Esperando datos..." };
@@ -48,9 +29,6 @@ function contenidoPopupMapa() {
   return "<strong>" + nombreUbicacionActual + "</strong><br>" + etiquetaTemperaturaActual;
 }
 
-// Crea el mapa dentro del div con el id indicado, centrado en la
-// ubicación inicial, con un círculo de color. "zoom" es opcional
-// (más alto = más acercado).
 function iniciarMapa(idDiv, zoom) {
   var contenedor = document.getElementById(idDiv);
   if (!contenedor || typeof L === "undefined") {
@@ -82,9 +60,6 @@ function iniciarMapa(idDiv, zoom) {
   return mapaLeaflet;
 }
 
-// Mueve el marcador (y centra el mapa) en la ubicación que se está
-// mostrando. La llama js/api.js con la latitud/longitud que le da
-// Open-Meteo.
 function actualizarUbicacionMapa(lat, lon, nombre) {
   if (!marcadorClimaMapa || !mapaLeaflet || lat === undefined || lon === undefined) {
     return;
@@ -96,9 +71,6 @@ function actualizarUbicacionMapa(lat, lon, nombre) {
   marcadorClimaMapa.setPopupContent(contenidoPopupMapa());
 }
 
-// Cambia el color (y el texto del popup) del marcador según la
-// temperatura recibida. La llama js/api.js cada vez que llega un
-// dato nuevo (o "null" cuando no hay dato).
 function actualizarColorClimaMapa(temperatura) {
   if (!marcadorClimaMapa) {
     return;

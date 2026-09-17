@@ -1,12 +1,5 @@
-// ---------------------------------------------------------------
-// Formulario de contacto — demostración del método POST.
-// Por ahora manda los datos a httpbin.org/post (un servicio público
-// que sólo devuelve de eco lo que le mandamos, útil para probar).
-// Cuando tengamos backend propio en Firebase, cambiar el endpoint.
-// ---------------------------------------------------------------
-
 var CONTACT_CONFIG = {
-  endpoint: "https://httpbin.org/post" // TODO: reemplazar por el endpoint de Firebase
+  endpoint: "https://httpbin.org/post" 
 };
 
 function enviarContacto() {

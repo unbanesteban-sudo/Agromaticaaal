@@ -57,8 +57,6 @@ ul {
   padding: 0 20px;
 }
 
-/* ---------- Header / Nav ---------- */
-
 .site-header {
   position: sticky;
   top: 0;
@@ -128,8 +126,6 @@ ul {
   border-radius: 2px;
 }
 
-/* ---------- Hero ---------- */
-
 .hero {
   background: var(--color-surface-alt);
   border-bottom: 1px solid var(--color-border);
@@ -194,8 +190,6 @@ ul {
   gap: 28px;
   align-items: stretch;
 }
-
-/* ---------- Tarjeta de clima actual ---------- */
 
 .weather-card {
   background: var(--color-surface);
@@ -290,8 +284,6 @@ ul {
   color: var(--color-primary-light);
 }
 
-/* ---------- Mapa embebido en el hero ---------- */
-
 .map-card {
   background: var(--color-surface);
   border: 1px solid var(--color-border);
@@ -323,8 +315,6 @@ ul {
   height: 320px;
 }
 
-/* ---------- Secciones generales ---------- */
-
 .section {
   padding: 56px 0;
 }
@@ -335,8 +325,6 @@ ul {
   margin: 0 0 28px;
   color: var(--color-primary-dark);
 }
-
-/* ---------- Accesos rápidos ---------- */
 
 .quick-links {
   display: grid;
@@ -383,8 +371,6 @@ ul {
   color: var(--color-text-muted);
 }
 
-/* ---------- Novedades / cards de contenido ---------- */
-
 .updates-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
@@ -420,8 +406,6 @@ ul {
   margin: 8px 0 0;
 }
 
-/* ---------- Página genérica (esqueletos) ---------- */
-
 .page-header {
   background: var(--color-primary-dark);
   color: #fff;
@@ -446,8 +430,6 @@ ul {
   text-align: center;
   color: var(--color-text-muted);
 }
-
-/* ---------- Asistente de IA (widget flotante) ---------- */
 
 .ia-widget-toggle {
   position: fixed;
@@ -614,8 +596,6 @@ ul {
   }
 }
 
-/* ---------- Formulario de contacto ---------- */
-
 .contact-form {
   max-width: 480px;
   margin: 0 auto;
@@ -678,8 +658,6 @@ ul {
   font-size: 0.85rem;
   color: var(--color-text-muted);
 }
-
-/* ---------- Footer ---------- */
 
 .site-footer {
   background: var(--color-primary-dark);
@@ -747,8 +725,6 @@ ul {
   color: rgba(255, 255, 255, 0.55);
   text-align: center;
 }
-
-/* ---------- Responsive ---------- */
 
 @media (max-width: 860px) {
   .hero-grid {

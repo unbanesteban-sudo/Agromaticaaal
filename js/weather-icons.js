@@ -65,7 +65,7 @@ function getWeatherIconKey(descripcion) {
   const texto = (descripcion || "")
     .toLowerCase()
     .normalize("NFD")
-    .replace(/[̀-ͯ]/g, ""); // saca tildes
+    .replace(/[̀-ͯ]/g, ""); 
 
   if (/tormenta|electrica/.test(texto)) return "tormenta";
   if (/lluvia|lloviz|chubasco|precipitacion/.test(texto)) return "lluvia";

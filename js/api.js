@@ -16,6 +16,7 @@ function setTextoSiExiste(id, texto) {
     el.innerText = texto;
   }
 }
+
 function fetchConTimeout(url) {
   var controller = new AbortController();
   var timeoutId = setTimeout(function () {
@@ -32,6 +33,7 @@ function fetchConTimeout(url) {
       throw error;
     });
 }
+
 function geocodificarCiudad(nombreCiudad) {
   var url = API_CONFIG.geocodingUrl + "?name=" + encodeURIComponent(nombreCiudad) + "&count=1&language=es";
 
@@ -49,7 +51,6 @@ function geocodificarCiudad(nombreCiudad) {
     });
 }
 
-// Pide el clima actual a Open-Meteo para una latitud/longitud.
 function fetchClimaPorCoordenadas(lat, lon) {
   var url = API_CONFIG.forecastUrl + "?latitude=" + lat + "&longitude=" + lon + "&current=" + API_CONFIG.campos;
 
@@ -82,7 +83,6 @@ function renderClima(ciudad, clima) {
   setTextoSiExiste("weatherHumedad", (clima.humedad !== null && clima.humedad !== undefined) ? Math.round(clima.humedad) : "--");
   setTextoSiExiste("weatherPresion", (clima.presion !== null && clima.presion !== undefined) ? Math.round(clima.presion) : "--");
   setTextoSiExiste("weatherViento", (clima.viento !== null && clima.viento !== undefined) ? Math.round(clima.viento) : "--");
-  // Open-Meteo no incluye visibilidad en el bloque "current".
   setTextoSiExiste("weatherVisibilidad", "--");
   setTextoSiExiste("weatherUpdated", clima.actualizado);
   setTextoSiExiste("weatherDesc", "Datos de Open-Meteo");
@@ -120,9 +120,6 @@ function mostrarEstadoError(mensaje) {
   }
 }
 
-// Pide y muestra el clima para una ubicación ya resuelta (con
-// latitud/longitud). La usan tanto la detección por IP como la
-// búsqueda manual, una vez que ya se sabe dónde buscar.
 function mostrarClimaEnUbicacion(ciudad, lat, lon) {
   ultimaUbicacion = { ciudad: ciudad, lat: lat, lon: lon };
   mostrarEstadoCargando(ciudad);
@@ -141,8 +138,6 @@ function mostrarClimaEnUbicacion(ciudad, lat, lon) {
     });
 }
 
-// Reintenta sin recargar la página entera (útil si se cortó la
-// conexión un instante). Repite la última ubicación mostrada.
 function reintentarClima() {
   if (ultimaUbicacion) {
     mostrarClimaEnUbicacion(ultimaUbicacion.ciudad, ultimaUbicacion.lat, ultimaUbicacion.lon);
@@ -151,10 +146,6 @@ function reintentarClima() {
   }
 }
 
-// Busca la ciudad escrita en el buscador (método GET a la API de
-// Geocoding de Open-Meteo) y, si existe, muestra su clima real.
-// Como Open-Meteo tiene datos para cualquier ciudad, ya no hace
-// falta limitarse a Cutral Có.
 function mostrarClimaSegunCiudad(ciudad) {
   if (!ciudad) {
     ciudad = API_CONFIG.ciudadPorDefecto;
@@ -176,11 +167,6 @@ function buscarClima() {
   mostrarClimaSegunCiudad(ciudad);
 }
 
-// Detecta la ciudad del usuario por IP (GET a un servicio externo,
-// gratis y sin api key) para mostrar de entrada el clima de donde
-// está. ipapi.co ya da latitud/longitud, así que no hace falta
-// geocodificar de nuevo. Si falla (sin internet, bloqueado, etc.)
-// cae en Cutral Có.
 function detectarCiudadPorIP() {
   fetchConTimeout("https://ipapi.co/json/")
     .then(function (datos) {

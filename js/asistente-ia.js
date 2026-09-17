@@ -1,20 +1,3 @@
-// ---------------------------------------------------------------
-// Asistente de IA para Agromatical (widget flotante, en index.html)
-// ---------------------------------------------------------------
-// Responde dudas de agricultores sobre riego, cuidado de cultivos, y
-// cómo interpretar la temperatura/humedad que muestra la página. Usa
-// Workers AI (Cloudflare) a través de un Worker propio (agria), que
-// es el único que habla con el modelo de IA. Como Workers AI no usa
-// api key propia (viene incluido en la cuenta de Cloudflare), acá no
-// hay ningún secreto que cuidar. Ver cloudflare-worker/README.md
-// para más detalle.
-//
-// El widget guarda el historial de la charla en una variable (en
-// memoria), para que el asistente tenga contexto de lo que se habló
-// antes y no se le "olvide" la pregunta anterior. Ese historial se
-// pierde si se recarga la página — no hace falta guardarlo en
-// ningún lado para una demo.
-
 var SYSTEM_PROMPT_BASE = "Sos el asistente de Climaxer (Agromatical), un sistema de monitoreo de " +
   "temperatura y humedad para agricultores. Respondés dudas sobre riego, cuidado de " +
   "cultivos, y cómo interpretar la temperatura y humedad que muestra la página. " +
@@ -22,12 +5,6 @@ var SYSTEM_PROMPT_BASE = "Sos el asistente de Climaxer (Agromatical), un sistema
   "específico del cultivo del usuario, lo aclarás en vez de inventar. Respondés " +
   "siempre en español.";
 
-// Arma el system prompt de cada pedido, sumándole el dato real que
-// esté mostrando la página en ese momento (lo guarda js/api.js en
-// "ultimoClimaMostrado"). Así, si preguntan "¿qué temperatura hace
-// en Cutral Có?", la IA usa el número real de la página en vez de
-// inventar uno propio (los modelos de lenguaje no tienen acceso a
-// datos del clima en tiempo real por sí solos).
 function construirSystemPrompt() {
   var prompt = SYSTEM_PROMPT_BASE;
 
@@ -51,13 +28,6 @@ function construirSystemPrompt() {
   return prompt;
 }
 
-// Además de ir en el system prompt, el dato real se repite pegado a
-// la pregunta misma. Los modelos chicos (como el que usamos acá,
-// llama-3.1-8b) a veces "no prestan atención" a una instrucción que
-// quedó lejos, al principio de todo, y contestan con su reflejo
-// entrenado de "no tengo acceso a datos en tiempo real" aunque el
-// dato esté ahí — pegándolo justo al lado de la pregunta se reduce
-// mucho ese problema.
 function datoRealComoTexto() {
   if (typeof ultimoClimaMostrado !== "undefined" && ultimoClimaMostrado &&
       ultimoClimaMostrado.temperatura !== null && ultimoClimaMostrado.temperatura !== undefined) {
@@ -77,9 +47,6 @@ var AI_CONFIG = {
   endpoint: "https://agria.unbanesteban.workers.dev/"
 };
 
-// Cuántos mensajes (entre preguntas y respuestas) se mandan como
-// contexto como máximo. Si la charla se hace muy larga, se van
-// descartando los mensajes más viejos para no mandar de más.
 var MAX_HISTORIAL = 16;
 
 var historialIA = [];
@@ -113,10 +80,6 @@ function preguntarAlAsistente(mensajes) {
       return "Hubo un error consultando al asistente. Revisá la conexión e intentá de nuevo.";
     });
 }
-
-// ---------------------------------------------------------------
-// Widget: abrir/cerrar y mostrar mensajes en pantalla
-// ---------------------------------------------------------------
 
 function toggleAsistenteIA() {
   var panel = document.getElementById("iaPanel");
@@ -164,11 +127,6 @@ function enviarMensajeIA() {
   iaEstaPensando = true;
   var burbujaPensando = agregarBurbujaIA("Pensando...", "asistente-pensando");
 
-  // Para mandar a la API se arma una copia del historial donde la
-  // última pregunta lleva pegado el dato real (ver datoRealComoTexto
-  // más arriba). El historialIA que se guarda y se muestra en
-  // pantalla queda limpio, sin ese texto extra repetido en cada
-  // vuelta.
   var mensajesParaAPI = historialIA.slice();
   mensajesParaAPI[mensajesParaAPI.length - 1] = {
     role: "user",
