@@ -615,6 +615,139 @@ ul {
   border-radius: 999px;
 }
 
+.invernadero-card-cielo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 20px 0;
+  font-size: 0.9rem;
+  color: var(--color-text);
+}
+
+.invernadero-cielo-icono {
+  width: 28px;
+  height: 28px;
+  display: inline-block;
+}
+
+.invernadero-cielo-icono svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.invernadero-alertas {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 16px 20px 0;
+}
+
+.alerta-invernadero {
+  padding: 10px 14px;
+  border-radius: var(--radius-sm);
+  font-size: 0.85rem;
+  line-height: 1.5;
+  border: 1px solid transparent;
+}
+
+.alerta-helada {
+  background: #eaf2fb;
+  color: #2d5c8a;
+  border-color: #c4dcf3;
+}
+
+.alerta-ventilacion {
+  background: #fdf1e3;
+  color: #8a5a1f;
+  border-color: #f3d8b3;
+}
+
+.pronostico-invernadero {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  padding: 16px 20px 0;
+}
+
+.pronostico-dia {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  background: var(--color-surface-alt);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  padding: 10px 6px;
+  text-align: center;
+}
+
+.pronostico-dia-etiqueta {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+}
+
+.pronostico-dia-icono {
+  width: 32px;
+  height: 32px;
+}
+
+.pronostico-dia-icono svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.pronostico-dia-desc {
+  font-size: 0.76rem;
+  color: var(--color-text-muted);
+}
+
+.pronostico-dia-temp {
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: var(--color-text);
+}
+
+.invernadero-tips {
+  padding: 4px 20px 16px;
+}
+
+.invernadero-tips-titulo {
+  margin: 12px 0 8px;
+  font-size: 0.92rem;
+  color: var(--color-text);
+}
+
+.invernadero-tips-lista {
+  margin: 0;
+  padding-left: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 0.85rem;
+  color: var(--color-text-muted);
+}
+
+.fondo-subir-label {
+  display: block;
+  margin-top: 10px;
+  font-size: 0.8rem;
+  color: var(--color-text-muted);
+}
+
+.fondo-archivo-input {
+  margin-top: 6px;
+  font-size: 0.82rem;
+  max-width: 100%;
+}
+
+.fondo-option-personalizada {
+  border-style: dashed;
+}
+
 .updates-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));

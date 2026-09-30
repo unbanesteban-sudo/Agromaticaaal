@@ -1,7 +1,7 @@
 var API_CONFIG = {
   forecastUrl: "https://api.open-meteo.com/v1/forecast",
   geocodingUrl: "https://geocoding-api.open-meteo.com/v1/search",
-  campos: "temperature_2m,relative_humidity_2m,pressure_msl,wind_speed_10m,precipitation",
+  campos: "temperature_2m,relative_humidity_2m,pressure_msl,wind_speed_10m,precipitation,weather_code",
   ciudadPorDefecto: "Cutral Co",
   timeoutMs: 6000
 };
@@ -51,11 +51,71 @@ function geocodificarCiudad(nombreCiudad) {
     });
 }
 
+function descripcionWeatherCode(codigo) {
+  var descripciones = {
+    0: "Despejado",
+    1: "Mayormente despejado",
+    2: "Parcialmente nublado",
+    3: "Nublado",
+    45: "Nublado con niebla",
+    48: "Nublado con niebla",
+    51: "Llovizna",
+    53: "Llovizna",
+    55: "Llovizna",
+    56: "Llovizna helada",
+    57: "Llovizna helada",
+    61: "Lluvia",
+    63: "Lluvia",
+    65: "Lluvia",
+    66: "Lluvia helada",
+    67: "Lluvia helada",
+    71: "Nieve",
+    73: "Nieve",
+    75: "Nieve",
+    77: "Nieve granulada",
+    80: "Chubascos",
+    81: "Chubascos",
+    82: "Chubascos fuertes",
+    85: "Nevadas",
+    86: "Nevadas fuertes",
+    95: "Tormenta eléctrica",
+    96: "Tormenta con granizo",
+    99: "Tormenta con granizo"
+  };
+
+  if (descripciones[codigo] !== undefined) {
+    return descripciones[codigo];
+  }
+  return "Sin dato";
+}
+
 function fetchClimaPorCoordenadas(lat, lon) {
-  var url = API_CONFIG.forecastUrl + "?latitude=" + lat + "&longitude=" + lon + "&current=" + API_CONFIG.campos;
+  var url = API_CONFIG.forecastUrl + "?latitude=" + lat + "&longitude=" + lon +
+    "&current=" + API_CONFIG.campos +
+    "&daily=temperature_2m_max,temperature_2m_min,precipitation_sum,weather_code" +
+    "&timezone=auto";
 
   return fetchConTimeout(url).then(function (data) {
     var actual = data.current || {};
+    var diario = data.daily || {};
+    var etiquetas = ["Hoy", "Mañana", "Pasado"];
+    var pronostico = [];
+
+    if (diario.time) {
+      for (var i = 0; i < diario.time.length && i < 3; i++) {
+        var codigoDia = diario.weather_code ? diario.weather_code[i] : null;
+        pronostico.push({
+          etiqueta: etiquetas[i] || diario.time[i],
+          fecha: diario.time[i],
+          tempMax: diario.temperature_2m_max ? diario.temperature_2m_max[i] : null,
+          tempMin: diario.temperature_2m_min ? diario.temperature_2m_min[i] : null,
+          precipitacion: diario.precipitation_sum ? diario.precipitation_sum[i] : null,
+          codigo: codigoDia,
+          descripcion: descripcionWeatherCode(codigoDia)
+        });
+      }
+    }
+
     return {
       lat: lat,
       lon: lon,
@@ -64,6 +124,9 @@ function fetchClimaPorCoordenadas(lat, lon) {
       presion: actual.pressure_msl,
       viento: actual.wind_speed_10m,
       precipitacion: actual.precipitation,
+      codigoClima: actual.weather_code,
+      descripcion: descripcionWeatherCode(actual.weather_code),
+      pronostico: pronostico,
       actualizado: new Date().toLocaleTimeString("es-AR", { hour: "2-digit", minute: "2-digit" })
     };
   });
@@ -77,6 +140,9 @@ function renderClima(ciudad, clima) {
     presion: clima.presion,
     viento: clima.viento,
     precipitacion: clima.precipitacion,
+    codigoClima: clima.codigoClima,
+    descripcion: clima.descripcion,
+    pronostico: clima.pronostico,
     actualizado: clima.actualizado
   };
 

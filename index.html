@@ -101,16 +101,31 @@
               <p id="invernaderoPlantas"></p>
             </div>
           </div>
+
+          <div class="invernadero-card-cielo" id="invernaderoCielo" style="display:none;">
+            <span class="invernadero-cielo-icono" id="invernaderoCieloIcono"></span>
+            <span id="invernaderoCieloTexto"></span>
+          </div>
+
           <div class="invernadero-card-clima">
             <div><span>Temperatura</span><strong><span id="invTemp">--</span>°</strong></div>
             <div><span>Humedad</span><strong><span id="invHumedad">--</span>%</strong></div>
             <div><span>Viento</span><strong><span id="invViento">--</span> km/h</strong></div>
           </div>
 
+          <div class="invernadero-alertas" id="invernaderoAlertas" style="display:none;"></div>
+
+          <div class="pronostico-invernadero" id="invernaderoPronostico"></div>
+
           <div class="horarios-riego">
             <h4 class="horarios-riego-titulo">Horario de riego sugerido para hoy</h4>
             <p class="consejo-riego" id="horariosRiegoMensaje">Cargando el horario de riego...</p>
             <div class="horarios-riego-lista" id="horariosRiegoLista"></div>
+          </div>
+
+          <div class="invernadero-tips" id="invernaderoTipsBox" style="display:none;">
+            <h4 class="invernadero-tips-titulo">Consejos para tus plantas</h4>
+            <ul class="invernadero-tips-lista" id="invernaderoTips"></ul>
           </div>
 
           <div class="invernadero-card-acciones">
@@ -277,6 +292,8 @@
       <div class="form-field">
         <label>Elegí un fondo</label>
         <div class="fondo-picker" id="fondoPicker"></div>
+        <label class="fondo-subir-label" for="fondoArchivoInput">O subí una foto tuya desde tu galería</label>
+        <input type="file" id="fondoArchivoInput" class="fondo-archivo-input" accept="image/*" onchange="cargarFotoInvernadero(event)">
       </div>
 
       <button type="button" class="invernadero-btn-guardar" onclick="guardarInvernadero()">Guardar invernadero</button>
@@ -289,6 +306,7 @@
 
   <script src="js/main.js"></script>
   <script src="js/api.js"></script>
+  <script src="js/weather-icons.js"></script>
   <script src="js/invernadero.js"></script>
   <script src="js/asistente-ia.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>

@@ -5,10 +5,33 @@ var FONDOS_INVERNADERO = [
   { id: "fondo4", archivo: "assets/invernaderos/fondo-4.svg", nombre: "Cielo" }
 ];
 
+var TIPS_POR_PLANTA = [
+  { claves: ["tomate"], consejo: "Los tomates necesitan riego regular pero sin mojar las hojas, para evitar hongos. Tutorálos a medida que crecen." },
+  { claves: ["lechuga"], consejo: "La lechuga prefiere riegos frecuentes y suaves, y sufre con el calor fuerte del mediodía." },
+  { claves: ["frutilla", "fresa"], consejo: "Las frutillas necesitan buen drenaje: regá seguido pero sin encharcar la tierra." },
+  { claves: ["pimiento", "morron", "morrón", "aji", "ají"], consejo: "Los pimientos y ajíes disfrutan el calor, pero necesitan riego constante para no perder flores." },
+  { claves: ["zanahoria"], consejo: "La zanahoria necesita tierra suelta y húmeda de forma pareja, sin encharcamientos." },
+  { claves: ["cebolla"], consejo: "La cebolla necesita riego moderado; reducí el agua cuando el bulbo ya esté formado." },
+  { claves: ["papa", "patata"], consejo: "La papa necesita riego constante mientras se forman los tubérculos, y menos hacia la cosecha." },
+  { claves: ["albahaca"], consejo: "La albahaca es sensible al frío: protegela de las heladas y regala seguido en días de calor." },
+  { claves: ["pepino", "pepinillo"], consejo: "El pepino necesita mucha agua, sobre todo cuando empieza a dar frutos." },
+  { claves: ["zapallo", "calabaza"], consejo: "El zapallo necesita bastante espacio y riego profundo y espaciado, mejor que riegos cortos y frecuentes." },
+  { claves: ["flor", "flores"], consejo: "Las flores en general agradecen riegos moderados y buena luz, evitando mojar los pétalos." }
+];
+
 var INVERNADERO_STORAGE_KEY = "agromaticalInvernadero";
 var fondoSeleccionadoInvernadero = FONDOS_INVERNADERO[0].id;
+var fotoPersonalizadaInvernadero = null;
+
+function esFotoPersonalizada(fondo) {
+  return !!fondo && fondo.indexOf("data:image") === 0;
+}
 
 function archivoDeFondo(id) {
+  if (esFotoPersonalizada(id)) {
+    return id;
+  }
+
   for (var i = 0; i < FONDOS_INVERNADERO.length; i++) {
     if (FONDOS_INVERNADERO[i].id === id) {
       return FONDOS_INVERNADERO[i].archivo;
@@ -35,11 +58,110 @@ function construirFondoPicker() {
     boton.setAttribute("onclick", "elegirFondoInvernadero('" + fondo.id + "')");
     contenedor.appendChild(boton);
   }
+
+  if (fotoPersonalizadaInvernadero) {
+    var botonFoto = document.createElement("button");
+    botonFoto.type = "button";
+    botonFoto.className = "fondo-option fondo-option-personalizada" + (esFotoPersonalizada(fondoSeleccionadoInvernadero) ? " selected" : "");
+    botonFoto.style.backgroundImage = "url('" + fotoPersonalizadaInvernadero + "')";
+    botonFoto.title = "Tu foto";
+    botonFoto.setAttribute("onclick", "elegirFotoPersonalizadaInvernadero()");
+    contenedor.appendChild(botonFoto);
+  }
 }
 
 function elegirFondoInvernadero(id) {
   fondoSeleccionadoInvernadero = id;
   construirFondoPicker();
+}
+
+function elegirFotoPersonalizadaInvernadero() {
+  if (fotoPersonalizadaInvernadero) {
+    fondoSeleccionadoInvernadero = fotoPersonalizadaInvernadero;
+    construirFondoPicker();
+  }
+}
+
+function cargarFotoInvernadero(evento) {
+  var archivo = evento.target.files && evento.target.files[0];
+  if (!archivo) {
+    return;
+  }
+
+  if (archivo.size > 8 * 1024 * 1024) {
+    alert("Esa foto es muy pesada. Elegí una imagen más liviana.");
+    evento.target.value = "";
+    return;
+  }
+
+  var lector = new FileReader();
+  lector.onload = function (eventoLectura) {
+    var imagen = new Image();
+    imagen.onload = function () {
+      var anchoMax = 800;
+      var escala = imagen.width > anchoMax ? anchoMax / imagen.width : 1;
+
+      var canvas = document.createElement("canvas");
+      canvas.width = Math.round(imagen.width * escala);
+      canvas.height = Math.round(imagen.height * escala);
+
+      var contexto = canvas.getContext("2d");
+      contexto.drawImage(imagen, 0, 0, canvas.width, canvas.height);
+
+      var dataUrl = canvas.toDataURL("image/jpeg", 0.7);
+      fotoPersonalizadaInvernadero = dataUrl;
+      fondoSeleccionadoInvernadero = dataUrl;
+      construirFondoPicker();
+    };
+    imagen.src = eventoLectura.target.result;
+  };
+  lector.readAsDataURL(archivo);
+}
+
+function tipsSegunPlantas(plantasTexto) {
+  var consejos = [];
+
+  if (!plantasTexto) {
+    return consejos;
+  }
+
+  var texto = plantasTexto.toLowerCase();
+
+  for (var i = 0; i < TIPS_POR_PLANTA.length; i++) {
+    var item = TIPS_POR_PLANTA[i];
+    for (var j = 0; j < item.claves.length; j++) {
+      if (texto.indexOf(item.claves[j]) !== -1) {
+        consejos.push(item.consejo);
+        break;
+      }
+    }
+  }
+
+  return consejos;
+}
+
+function renderizarTipsPlantas(plantasTexto) {
+  var caja = document.getElementById("invernaderoTipsBox");
+  var lista = document.getElementById("invernaderoTips");
+  if (!caja || !lista) {
+    return;
+  }
+
+  var consejos = tipsSegunPlantas(plantasTexto);
+  lista.innerHTML = "";
+
+  if (consejos.length === 0) {
+    caja.style.display = "none";
+    return;
+  }
+
+  caja.style.display = "";
+
+  for (var i = 0; i < consejos.length; i++) {
+    var item = document.createElement("li");
+    item.textContent = consejos[i];
+    lista.appendChild(item);
+  }
 }
 
 function leerInvernadero() {
@@ -56,6 +178,7 @@ function guardarInvernaderoEnStorage(datos) {
     localStorage.setItem(INVERNADERO_STORAGE_KEY, JSON.stringify(datos));
   } catch (error) {
     console.error("[Agromatical] No se pudo guardar el invernadero:", error);
+    alert("No se pudo guardar el invernadero (puede que la foto sea muy pesada para guardar en este navegador).");
   }
 }
 
@@ -66,10 +189,17 @@ function abrirModalInvernadero() {
     document.getElementById("invernaderoNombreInput").value = datos.nombre;
     document.getElementById("invernaderoPlantasInput").value = datos.plantas;
     fondoSeleccionadoInvernadero = datos.fondo;
+    fotoPersonalizadaInvernadero = esFotoPersonalizada(datos.fondo) ? datos.fondo : null;
   } else {
     document.getElementById("invernaderoNombreInput").value = "";
     document.getElementById("invernaderoPlantasInput").value = "";
     fondoSeleccionadoInvernadero = FONDOS_INVERNADERO[0].id;
+    fotoPersonalizadaInvernadero = null;
+  }
+
+  var inputArchivo = document.getElementById("fondoArchivoInput");
+  if (inputArchivo) {
+    inputArchivo.value = "";
   }
 
   construirFondoPicker();
@@ -127,9 +257,116 @@ function mostrarInvernadero() {
   document.getElementById("invernaderoPlantas").innerText = datos.plantas || "Sin plantas cargadas todavía.";
 
   actualizarHorariosRiego();
+  renderizarTipsPlantas(datos.plantas);
 
   if (typeof ultimoClimaMostrado !== "undefined" && ultimoClimaMostrado) {
     actualizarClimaInvernadero(ultimoClimaMostrado);
+  }
+}
+
+function actualizarCieloInvernadero(clima) {
+  var contenedor = document.getElementById("invernaderoCielo");
+  var icono = document.getElementById("invernaderoCieloIcono");
+  var texto = document.getElementById("invernaderoCieloTexto");
+
+  if (!contenedor || !icono || !texto) {
+    return;
+  }
+
+  if (!clima || !clima.descripcion || clima.descripcion === "Sin dato") {
+    contenedor.style.display = "none";
+    return;
+  }
+
+  contenedor.style.display = "";
+  texto.textContent = clima.descripcion;
+  icono.innerHTML = (typeof getWeatherIconSvg === "function") ? getWeatherIconSvg(clima.descripcion) : "";
+}
+
+function renderizarPronostico(pronostico) {
+  var contenedor = document.getElementById("invernaderoPronostico");
+  if (!contenedor) {
+    return;
+  }
+
+  contenedor.innerHTML = "";
+
+  if (!pronostico || pronostico.length === 0) {
+    return;
+  }
+
+  for (var i = 0; i < pronostico.length; i++) {
+    var dia = pronostico[i];
+    var tarjeta = document.createElement("div");
+    tarjeta.className = "pronostico-dia";
+
+    var icono = (typeof getWeatherIconSvg === "function") ? getWeatherIconSvg(dia.descripcion) : "";
+    var maxTexto = (dia.tempMax !== null && dia.tempMax !== undefined) ? Math.round(dia.tempMax) + "°" : "--";
+    var minTexto = (dia.tempMin !== null && dia.tempMin !== undefined) ? Math.round(dia.tempMin) + "°" : "--";
+
+    tarjeta.innerHTML =
+      "<span class=\"pronostico-dia-etiqueta\">" + dia.etiqueta + "</span>" +
+      "<span class=\"pronostico-dia-icono\">" + icono + "</span>" +
+      "<span class=\"pronostico-dia-desc\">" + dia.descripcion + "</span>" +
+      "<span class=\"pronostico-dia-temp\">" + maxTexto + " / " + minTexto + "</span>";
+
+    contenedor.appendChild(tarjeta);
+  }
+}
+
+function generarAlertas(clima) {
+  var alertas = [];
+
+  if (!clima) {
+    return alertas;
+  }
+
+  if (clima.temperatura !== null && clima.temperatura !== undefined && clima.temperatura <= 3) {
+    alertas.push({ tipo: "helada", texto: "Hay riesgo de helada ahora mismo (" + Math.round(clima.temperatura) + "°). Cubrí las plantas más sensibles o metélas adentro si podés." });
+  }
+
+  if (clima.pronostico) {
+    for (var i = 0; i < clima.pronostico.length; i++) {
+      var dia = clima.pronostico[i];
+      if (dia.tempMin !== null && dia.tempMin !== undefined && dia.tempMin <= 2) {
+        var cuando = (dia.etiqueta === "Hoy") ? "esta noche" : dia.etiqueta.toLowerCase();
+        alertas.push({ tipo: "helada", texto: "Se espera helada " + cuando + " (mínima de " + Math.round(dia.tempMin) + "°). Prepará una cobertura para las plantas." });
+      }
+    }
+  }
+
+  if (clima.temperatura !== null && clima.temperatura !== undefined && clima.temperatura >= 32) {
+    alertas.push({ tipo: "ventilacion", texto: "Hace mucho calor (" + Math.round(clima.temperatura) + "°) para tener el invernadero cerrado. Abrí las ventilaciones o la puerta para que no se cocinen las plantas." });
+  }
+
+  if (clima.humedad !== null && clima.humedad !== undefined && clima.humedad >= 90 &&
+      clima.temperatura !== null && clima.temperatura !== undefined && clima.temperatura >= 20) {
+    alertas.push({ tipo: "ventilacion", texto: "Humedad muy alta (" + Math.round(clima.humedad) + "%) con calor adentro. Ventilá un rato para que no aparezcan hongos en las hojas." });
+  }
+
+  return alertas;
+}
+
+function renderizarAlertas(alertas) {
+  var contenedor = document.getElementById("invernaderoAlertas");
+  if (!contenedor) {
+    return;
+  }
+
+  contenedor.innerHTML = "";
+
+  if (!alertas || alertas.length === 0) {
+    contenedor.style.display = "none";
+    return;
+  }
+
+  contenedor.style.display = "";
+
+  for (var i = 0; i < alertas.length; i++) {
+    var aviso = document.createElement("div");
+    aviso.className = "alerta-invernadero alerta-" + alertas[i].tipo;
+    aviso.textContent = alertas[i].texto;
+    contenedor.appendChild(aviso);
   }
 }
 
@@ -138,6 +375,9 @@ function actualizarClimaInvernadero(clima) {
   setTextoSiExiste("invHumedad", (clima.humedad !== null && clima.humedad !== undefined) ? Math.round(clima.humedad) : "--");
   setTextoSiExiste("invViento", (clima.viento !== null && clima.viento !== undefined) ? Math.round(clima.viento) : "--");
   actualizarHorariosRiego(clima);
+  actualizarCieloInvernadero(clima);
+  renderizarPronostico(clima.pronostico);
+  renderizarAlertas(generarAlertas(clima));
 }
 
 function generarHorariosRiego(clima) {
