@@ -1,7 +1,7 @@
 var API_CONFIG = {
   forecastUrl: "https://api.open-meteo.com/v1/forecast",
   geocodingUrl: "https://geocoding-api.open-meteo.com/v1/search",
-  campos: "temperature_2m,relative_humidity_2m,pressure_msl,wind_speed_10m",
+  campos: "temperature_2m,relative_humidity_2m,pressure_msl,wind_speed_10m,precipitation",
   ciudadPorDefecto: "Cutral Co",
   timeoutMs: 6000
 };
@@ -63,6 +63,7 @@ function fetchClimaPorCoordenadas(lat, lon) {
       humedad: actual.relative_humidity_2m,
       presion: actual.pressure_msl,
       viento: actual.wind_speed_10m,
+      precipitacion: actual.precipitation,
       actualizado: new Date().toLocaleTimeString("es-AR", { hour: "2-digit", minute: "2-digit" })
     };
   });
@@ -75,6 +76,7 @@ function renderClima(ciudad, clima) {
     humedad: clima.humedad,
     presion: clima.presion,
     viento: clima.viento,
+    precipitacion: clima.precipitacion,
     actualizado: clima.actualizado
   };
 

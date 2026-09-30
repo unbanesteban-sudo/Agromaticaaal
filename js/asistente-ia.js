@@ -15,6 +15,7 @@ function construirSystemPrompt() {
       "ciudad: " + c.ciudad + ", temperatura: " + Math.round(c.temperatura) + "°C" +
       (c.humedad !== null && c.humedad !== undefined ? ", humedad: " + Math.round(c.humedad) + "%" : "") +
       (c.viento !== null && c.viento !== undefined ? ", viento: " + Math.round(c.viento) + " km/h" : "") +
+      (c.precipitacion !== null && c.precipitacion !== undefined ? ", lluvia: " + c.precipitacion + " mm" : "") +
       ", actualizado a las " + c.actualizado + ". Si te preguntan por la temperatura o el clima actual, " +
       "usá exactamente este dato — nunca inventes ni calcules otro número por tu cuenta, aunque te " +
       "pregunten por otra ciudad: si preguntan por otra ciudad distinta a \"" + c.ciudad + "\", aclará que " +
@@ -36,6 +37,7 @@ function datoRealComoTexto() {
       ", temperatura: " + Math.round(c.temperatura) + "°C" +
       (c.humedad !== null && c.humedad !== undefined ? ", humedad: " + Math.round(c.humedad) + "%" : "") +
       (c.viento !== null && c.viento !== undefined ? ", viento: " + Math.round(c.viento) + " km/h" : "") +
+      (c.precipitacion !== null && c.precipitacion !== undefined ? ", lluvia: " + c.precipitacion + " mm" : "") +
       ", actualizado " + c.actualizado + ". Si la pregunta es sobre el clima o la temperatura actual, " +
       "usá este dato exacto en tu respuesta, no digas que no tenés acceso.]";
   }

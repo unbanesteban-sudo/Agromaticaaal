@@ -107,25 +107,15 @@
             <div><span>Viento</span><strong><span id="invViento">--</span> km/h</strong></div>
           </div>
 
-          <div class="consejo-riego" id="consejoRiego">Cargando el consejo de riego...</div>
-
-          <div class="invernadero-card-acciones">
-            <button type="button" class="invernadero-btn-riego" onclick="registrarRiego()">Registrar riego</button>
-            <button type="button" onclick="abrirModalInvernadero()">Editar</button>
-            <button type="button" class="invernadero-btn-secundario" onclick="borrarInvernadero()">Eliminar</button>
+          <div class="horarios-riego">
+            <h4 class="horarios-riego-titulo">Horario de riego sugerido para hoy</h4>
+            <p class="consejo-riego" id="horariosRiegoMensaje">Cargando el horario de riego...</p>
+            <div class="horarios-riego-lista" id="horariosRiegoLista"></div>
           </div>
 
-          <div class="riegos-section">
-            <h4 class="riegos-titulo">Historial de riegos</h4>
-            <p class="riegos-vacio" id="tablaRiegosVacio">Todavía no registraste ningún riego.</p>
-            <div class="riegos-tabla-wrap" id="tablaRiegosWrap" style="display:none;">
-              <table class="riegos-tabla">
-                <thead>
-                  <tr><th>Fecha</th><th>Hora</th><th>Temp.</th><th>Humedad</th><th></th></tr>
-                </thead>
-                <tbody id="tablaRiegosBody"></tbody>
-              </table>
-            </div>
+          <div class="invernadero-card-acciones">
+            <button type="button" onclick="abrirModalInvernadero()">Editar</button>
+            <button type="button" class="invernadero-btn-secundario" onclick="borrarInvernadero()">Eliminar</button>
           </div>
         </div>
       </div>
