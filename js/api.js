@@ -94,6 +94,9 @@ function renderClima(ciudad, clima) {
   if (typeof actualizarColorClimaMapa === "function") {
     actualizarColorClimaMapa(clima.temperatura);
   }
+  if (typeof actualizarClimaInvernadero === "function") {
+    actualizarClimaInvernadero(clima);
+  }
 }
 
 function mostrarEstadoCargando(ciudad) {

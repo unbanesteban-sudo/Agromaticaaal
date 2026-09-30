@@ -1,6 +1,6 @@
 :root {
-  --color-primary: #2b2b2b;
-  --color-primary-dark: #1a1a1a;
+  --color-primary: #a8d9f7;
+  --color-primary-dark: #a2cfa9;
   --color-primary-light: #4d4d4d;
   --color-accent: #1a1a1a;
   --color-bg: #ffffff;
@@ -369,6 +369,204 @@ ul {
   margin: 0;
   font-size: 0.88rem;
   color: var(--color-text-muted);
+}
+
+.invernadero-cta {
+  background: var(--color-surface);
+  border: 1px dashed var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: 32px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+}
+
+.invernadero-cta p {
+  margin: 0;
+  color: var(--color-text-muted);
+  max-width: 420px;
+}
+
+.invernadero-cta button {
+  border: none;
+  background: var(--color-accent);
+  color: #fff;
+  font-weight: 600;
+  padding: 12px 24px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  font-size: 0.95rem;
+}
+
+.invernadero-cta button:hover {
+  background: var(--color-text);
+}
+
+.invernadero-card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+}
+
+.invernadero-card-fondo {
+  height: 220px;
+  background-size: cover;
+  background-position: center;
+  display: flex;
+  align-items: flex-end;
+}
+
+.invernadero-card-overlay {
+  width: 100%;
+  padding: 20px;
+  background: linear-gradient(0deg, rgba(0, 0, 0, 0.55), rgba(0, 0, 0, 0));
+  color: #fff;
+}
+
+.invernadero-card-overlay h3 {
+  margin: 0 0 4px;
+  font-size: 1.3rem;
+}
+
+.invernadero-card-overlay p {
+  margin: 0;
+  font-size: 0.88rem;
+  opacity: 0.9;
+}
+
+.invernadero-card-clima {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  padding: 18px 20px;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.invernadero-card-clima div {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 0.85rem;
+  color: var(--color-text-muted);
+}
+
+.invernadero-card-clima strong {
+  color: var(--color-text);
+  font-size: 1.2rem;
+  font-weight: 700;
+}
+
+.invernadero-card-acciones {
+  display: flex;
+  gap: 10px;
+  padding: 16px 20px;
+}
+
+.invernadero-card-acciones button {
+  border: none;
+  background: var(--color-accent);
+  color: #fff;
+  font-weight: 600;
+  padding: 8px 18px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  font-size: 0.88rem;
+}
+
+.invernadero-card-acciones button:hover {
+  background: var(--color-text);
+}
+
+.invernadero-btn-secundario {
+  background: var(--color-surface) !important;
+  color: var(--color-text) !important;
+  border: 1px solid var(--color-border) !important;
+}
+
+.invernadero-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.15s ease;
+  z-index: 300;
+}
+
+.invernadero-modal-overlay.open {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.invernadero-modal {
+  background: var(--color-surface);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+  width: 100%;
+  max-width: 420px;
+  max-height: calc(100vh - 40px);
+  overflow-y: auto;
+  padding-bottom: 20px;
+}
+
+.invernadero-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  background: var(--color-primary-dark);
+  color: #fff;
+  font-weight: 600;
+}
+
+.invernadero-modal .form-field {
+  padding: 0 20px;
+  margin-top: 16px;
+}
+
+.fondo-picker {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+}
+
+.fondo-option {
+  height: 48px;
+  border-radius: var(--radius-sm);
+  border: 2px solid transparent;
+  background-size: cover;
+  background-position: center;
+  cursor: pointer;
+  padding: 0;
+}
+
+.fondo-option.selected {
+  border-color: var(--color-accent);
+}
+
+.invernadero-btn-guardar {
+  display: block;
+  width: calc(100% - 40px);
+  margin: 20px 20px 0;
+  border: none;
+  background: var(--color-accent);
+  color: #fff;
+  font-weight: 600;
+  padding: 12px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  font-size: 0.95rem;
+}
+
+.invernadero-btn-guardar:hover {
+  background: var(--color-text);
 }
 
 .updates-grid {

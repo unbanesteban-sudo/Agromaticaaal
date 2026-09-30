@@ -7,6 +7,7 @@
   <meta name="description" content="Agromatical, proyecto académico de pronóstico del tiempo.">
   <link rel="stylesheet" href="css/style.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+  <link rel="icon" href="assets/logo.png">
 </head>
 <body>
 
@@ -79,6 +80,35 @@
 
           <div class="map-card">
             <div class="map-leaflet" id="mapaHero"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" style="padding-bottom:0;">
+      <div class="container">
+        <h2 class="section-title">Tu invernadero</h2>
+
+        <div class="invernadero-cta" id="invernaderoCta">
+          <p>Todavía no creaste tu invernadero. Ponele un nombre, elegí un fondo y contanos qué plantás.</p>
+          <button type="button" onclick="abrirModalInvernadero()">Crear invernadero</button>
+        </div>
+
+        <div class="invernadero-card" id="invernaderoCard" style="display:none;">
+          <div class="invernadero-card-fondo" id="invernaderoFondo">
+            <div class="invernadero-card-overlay">
+              <h3 id="invernaderoNombre"></h3>
+              <p id="invernaderoPlantas"></p>
+            </div>
+          </div>
+          <div class="invernadero-card-clima">
+            <div><span>Temperatura</span><strong><span id="invTemp">--</span>°</strong></div>
+            <div><span>Humedad</span><strong><span id="invHumedad">--</span>%</strong></div>
+            <div><span>Viento</span><strong><span id="invViento">--</span> km/h</strong></div>
+          </div>
+          <div class="invernadero-card-acciones">
+            <button type="button" onclick="abrirModalInvernadero()">Editar</button>
+            <button type="button" class="invernadero-btn-secundario" onclick="borrarInvernadero()">Eliminar</button>
           </div>
         </div>
       </div>
@@ -220,12 +250,39 @@
     </div>
   </div>
 
+  <div class="invernadero-modal-overlay" id="invernaderoModalOverlay">
+    <div class="invernadero-modal">
+      <div class="invernadero-modal-header">
+        <span>Tu invernadero</span>
+        <button type="button" class="ia-panel-close" onclick="cerrarModalInvernadero()" aria-label="Cerrar">&times;</button>
+      </div>
+
+      <div class="form-field">
+        <label for="invernaderoNombreInput">Nombre de tu invernadero</label>
+        <input type="text" id="invernaderoNombreInput" placeholder="Ej: Invernadero de Esteban" autocomplete="off">
+      </div>
+
+      <div class="form-field">
+        <label for="invernaderoPlantasInput">¿Qué plantas o cultivos tenés?</label>
+        <textarea id="invernaderoPlantasInput" rows="3" placeholder="Ej: tomates, lechuga, frutillas..."></textarea>
+      </div>
+
+      <div class="form-field">
+        <label>Elegí un fondo</label>
+        <div class="fondo-picker" id="fondoPicker"></div>
+      </div>
+
+      <button type="button" class="invernadero-btn-guardar" onclick="guardarInvernadero()">Guardar invernadero</button>
+    </div>
+  </div>
+
   <script>
     document.getElementById("footerYear").innerText = new Date().getFullYear();
   </script>
 
   <script src="js/main.js"></script>
   <script src="js/api.js"></script>
+  <script src="js/invernadero.js"></script>
   <script src="js/asistente-ia.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
   <script src="js/mapa.js"></script>
