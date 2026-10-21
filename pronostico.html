@@ -40,17 +40,22 @@
     <section class="page-header">
       <div class="container">
         <h1>Pronóstico extendido</h1>
-        <p>Próximos días para la ciudad seleccionada.</p>
+        <p>El tiempo de toda la semana y qué hacer con tu invernadero cada día.</p>
       </div>
     </section>
 
     <section class="section">
       <div class="container">
-        <div class="placeholder-box">
-          Acá va la grilla de pronóstico a 5–7 días.<br>
-          Iterar sobre el pronóstico diario de Open-Meteo (parámetro <code>daily</code>: fecha, ícono,
-          temperatura máx/mín, etc.) y renderizar una tarjeta por día, usando la misma lógica de <code>js/api.js</code>.
+        <div class="pronostico-top">
+          <h2 class="section-title pronostico-titulo" id="pronosticoCiudad">Próximos 7 días</h2>
+          <div class="search-form">
+            <input type="text" id="citySearchInput" placeholder="Buscar ciudad..." autocomplete="off">
+            <button type="button" onclick="buscarClima()">Buscar</button>
+          </div>
         </div>
+        <p class="pronostico-estado" id="weatherEstado">Cargando el pronóstico...</p>
+
+        <div class="pronostico-grid" id="pronosticoGrid"></div>
       </div>
     </section>
   </main>
@@ -103,5 +108,8 @@
   </script>
 
   <script src="js/main.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/weather-icons.js"></script>
+  <script src="js/pronostico.js"></script>
 </body>
 </html>

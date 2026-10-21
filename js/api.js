@@ -2,6 +2,7 @@ var API_CONFIG = {
   forecastUrl: "https://api.open-meteo.com/v1/forecast",
   geocodingUrl: "https://geocoding-api.open-meteo.com/v1/search",
   campos: "temperature_2m,relative_humidity_2m,pressure_msl,wind_speed_10m,precipitation,weather_code",
+  camposDiarios: "temperature_2m_max,temperature_2m_min,precipitation_sum,precipitation_probability_max,wind_speed_10m_max,weather_code",
   ciudadPorDefecto: "Cutral Co",
   timeoutMs: 6000
 };
@@ -89,27 +90,53 @@ function descripcionWeatherCode(codigo) {
   return "Sin dato";
 }
 
+function nombreDelDia(fecha, indice) {
+  if (indice === 0) {
+    return "Hoy";
+  }
+  if (indice === 1) {
+    return "Mañana";
+  }
+  var dias = ["Domingo", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"];
+  var d = new Date(fecha + "T12:00:00");
+  return dias[d.getDay()];
+}
+
+function fechaCorta(fecha) {
+  var partes = fecha.split("-");
+  return partes[2] + "/" + partes[1];
+}
+
+function valorDiario(lista, i) {
+  if (lista && lista[i] !== undefined) {
+    return lista[i];
+  }
+  return null;
+}
+
 function fetchClimaPorCoordenadas(lat, lon) {
   var url = API_CONFIG.forecastUrl + "?latitude=" + lat + "&longitude=" + lon +
     "&current=" + API_CONFIG.campos +
-    "&daily=temperature_2m_max,temperature_2m_min,precipitation_sum,weather_code" +
-    "&timezone=auto";
+    "&daily=" + API_CONFIG.camposDiarios +
+    "&forecast_days=7&timezone=auto";
 
   return fetchConTimeout(url).then(function (data) {
     var actual = data.current || {};
     var diario = data.daily || {};
-    var etiquetas = ["Hoy", "Mañana", "Pasado"];
     var pronostico = [];
 
     if (diario.time) {
-      for (var i = 0; i < diario.time.length && i < 3; i++) {
-        var codigoDia = diario.weather_code ? diario.weather_code[i] : null;
+      for (var i = 0; i < diario.time.length && i < 7; i++) {
+        var codigoDia = valorDiario(diario.weather_code, i);
         pronostico.push({
-          etiqueta: etiquetas[i] || diario.time[i],
+          etiqueta: nombreDelDia(diario.time[i], i),
           fecha: diario.time[i],
-          tempMax: diario.temperature_2m_max ? diario.temperature_2m_max[i] : null,
-          tempMin: diario.temperature_2m_min ? diario.temperature_2m_min[i] : null,
-          precipitacion: diario.precipitation_sum ? diario.precipitation_sum[i] : null,
+          fechaCorta: fechaCorta(diario.time[i]),
+          tempMax: valorDiario(diario.temperature_2m_max, i),
+          tempMin: valorDiario(diario.temperature_2m_min, i),
+          precipitacion: valorDiario(diario.precipitation_sum, i),
+          probLluvia: valorDiario(diario.precipitation_probability_max, i),
+          viento: valorDiario(diario.wind_speed_10m_max, i),
           codigo: codigoDia,
           descripcion: descripcionWeatherCode(codigoDia)
         });
@@ -164,6 +191,9 @@ function renderClima(ciudad, clima) {
   }
   if (typeof actualizarClimaInvernadero === "function") {
     actualizarClimaInvernadero(clima);
+  }
+  if (typeof renderizarPronosticoExtendido === "function") {
+    renderizarPronosticoExtendido(ciudad, clima.pronostico);
   }
 }
 

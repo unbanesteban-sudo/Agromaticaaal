@@ -1,7 +1,8 @@
 :root {
-  --color-primary: #a8d9f7;
-  --color-primary-dark: #a2cfa9;
-  --color-primary-light: #4d4d4d;
+  --color-primary: #4ba3e3;
+  --color-primary-dark: #2f7a45;
+  --color-primary-light: #6fae7d;
+  --color-primary-soft: #eaf5ec;
   --color-accent: #1a1a1a;
   --color-bg: #ffffff;
   --color-surface: #ffffff;
@@ -1145,4 +1146,167 @@ ul {
     flex-direction: column;
     align-items: flex-start;
   }
+}
+
+.pronostico-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-bottom: 8px;
+}
+
+.pronostico-titulo {
+  margin: 0;
+}
+
+.pronostico-estado {
+  margin: 0 0 24px;
+  font-size: 0.85rem;
+  color: var(--color-text-muted);
+}
+
+.pronostico-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 10px;
+}
+
+@media (max-width: 1000px) {
+  .pronostico-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+@media (max-width: 640px) {
+  .pronostico-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.pronostico-vacio {
+  color: var(--color-text-muted);
+}
+
+.dia-card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: 14px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.dia-card-hoy {
+  border-color: var(--color-primary-dark);
+  background: var(--color-primary-soft);
+}
+
+.dia-card-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+}
+
+.dia-card-nombre {
+  font-weight: 700;
+  color: var(--color-primary-dark);
+}
+
+.dia-card-fecha {
+  font-size: 0.8rem;
+  color: var(--color-text-muted);
+}
+
+.dia-card-icono {
+  width: 52px;
+  height: 52px;
+  margin: 0 auto;
+}
+
+.dia-card-icono svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.dia-card-desc {
+  margin: 0;
+  text-align: center;
+  font-size: 0.85rem;
+  color: var(--color-text-muted);
+  min-height: 2.4em;
+}
+
+.dia-card-temp {
+  margin: 0;
+  text-align: center;
+  font-size: 1rem;
+  color: var(--color-text-muted);
+}
+
+.dia-card-temp strong {
+  font-size: 1.3rem;
+  color: var(--color-text);
+}
+
+.dia-card-datos {
+  list-style: none;
+  margin: 0;
+  padding: 8px 0 0;
+  border-top: 1px solid var(--color-border);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 0.8rem;
+}
+
+.dia-card-datos li {
+  display: flex;
+  justify-content: space-between;
+  color: var(--color-text-muted);
+}
+
+.dia-card-datos li span:last-child {
+  color: var(--color-text);
+  font-weight: 600;
+}
+
+.dia-card-consejo {
+  margin: 4px 0 0;
+  padding: 8px 10px;
+  border-radius: var(--radius-sm);
+  font-size: 0.78rem;
+  line-height: 1.4;
+}
+
+.consejo-normal {
+  background: #eaf6ec;
+  color: #2f6b3a;
+}
+
+.consejo-lluvia {
+  background: #e8f2fb;
+  color: #2d5c8a;
+}
+
+.consejo-helada {
+  background: #eef0fb;
+  color: #3d4590;
+}
+
+.consejo-calor {
+  background: #fdf1e3;
+  color: #8a5a1f;
+}
+
+.consejo-viento {
+  background: #f2f2f2;
+  color: #4d4d4d;
+}
+
+.site-footer .brand-icon {
+  color: #cfe9fb;
 }

@@ -295,7 +295,7 @@ function renderizarPronostico(pronostico) {
     return;
   }
 
-  for (var i = 0; i < pronostico.length; i++) {
+  for (var i = 0; i < pronostico.length && i < 3; i++) {
     var dia = pronostico[i];
     var tarjeta = document.createElement("div");
     tarjeta.className = "pronostico-dia";
@@ -326,10 +326,15 @@ function generarAlertas(clima) {
   }
 
   if (clima.pronostico) {
-    for (var i = 0; i < clima.pronostico.length; i++) {
+    for (var i = 0; i < clima.pronostico.length && i < 3; i++) {
       var dia = clima.pronostico[i];
       if (dia.tempMin !== null && dia.tempMin !== undefined && dia.tempMin <= 2) {
-        var cuando = (dia.etiqueta === "Hoy") ? "esta noche" : dia.etiqueta.toLowerCase();
+        var cuando = "el " + dia.etiqueta.toLowerCase();
+        if (i === 0) {
+          cuando = "esta noche";
+        } else if (i === 1) {
+          cuando = "mañana";
+        }
         alertas.push({ tipo: "helada", texto: "Se espera helada " + cuando + " (mínima de " + Math.round(dia.tempMin) + "°). Prepará una cobertura para las plantas." });
       }
     }
