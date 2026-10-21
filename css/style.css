@@ -1,3 +1,27 @@
+/* ÍNDICE (buscá el número o el nombre con Ctrl+F)
+   1. VARIABLES (colores, bordes, sombras y fuente de toda la página)
+   2. BASE (estilos generales que usan todas las páginas)
+   3. HEADER (barra de arriba con el logo y el menú)
+   4. INICIO: CLIMA ACTUAL (título, buscador y tarjeta del clima)
+   5. INICIO: CUADRO DEL MAPA
+   6. SECCIONES Y TÍTULOS VERDES
+   7. INICIO: ACCESOS RÁPIDOS (las 4 tarjetas)
+   8. INVERNADERO (todo lo de "Tu invernadero" en el inicio)
+   9. INICIO: NOVEDADES DEL PROYECTO
+   10. FRANJA VERDE DE ARRIBA EN CADA PÁGINA (Pronóstico, Mapa, Nosotros, Contacto)
+   11. CUADRO PUNTEADO DE "EN PREPARACIÓN"
+   12. AgrIA (botón redondo y ventana del chat)
+   13. FORMULARIOS (Contacto, y los campos de la ventana del invernadero)
+   14. FOOTER (pie de página)
+   15. CELULAR Y TABLET (cómo se acomoda el inicio y el menú en pantallas chicas)
+   16. PÁGINA PRONÓSTICO (los 7 días)
+   17. PÁGINA NOSOTROS (proyecto y equipo)
+*/
+
+/* ==========================================================
+   1. VARIABLES (colores, bordes, sombras y fuente de toda la página)
+   ========================================================== */
+
 :root {
   --color-primary: #4ba3e3;
   --color-primary-dark: #2f7a45;
@@ -18,6 +42,10 @@
   --font-base: "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   --header-height: 68px;
 }
+
+/* ==========================================================
+   2. BASE (estilos generales que usan todas las páginas)
+   ========================================================== */
 
 * {
   box-sizing: border-box;
@@ -57,6 +85,10 @@ ul {
   margin: 0 auto;
   padding: 0 20px;
 }
+
+/* ==========================================================
+   3. HEADER (barra de arriba con el logo y el menú)
+   ========================================================== */
 
 .site-header {
   position: sticky;
@@ -126,6 +158,10 @@ ul {
   background: var(--color-primary-dark);
   border-radius: 2px;
 }
+
+/* ==========================================================
+   4. INICIO: CLIMA ACTUAL (título, buscador y tarjeta del clima)
+   ========================================================== */
 
 .hero {
   background: var(--color-surface-alt);
@@ -285,6 +321,10 @@ ul {
   color: var(--color-primary-light);
 }
 
+/* ==========================================================
+   5. INICIO: CUADRO DEL MAPA
+   ========================================================== */
+
 .map-card {
   background: var(--color-surface);
   border: 1px solid var(--color-border);
@@ -316,6 +356,10 @@ ul {
   height: 320px;
 }
 
+/* ==========================================================
+   6. SECCIONES Y TÍTULOS VERDES
+   ========================================================== */
+
 .section {
   padding: 56px 0;
 }
@@ -326,6 +370,10 @@ ul {
   margin: 0 0 28px;
   color: var(--color-primary-dark);
 }
+
+/* ==========================================================
+   7. INICIO: ACCESOS RÁPIDOS (las 4 tarjetas)
+   ========================================================== */
 
 .quick-links {
   display: grid;
@@ -372,6 +420,12 @@ ul {
   color: var(--color-text-muted);
 }
 
+/* ==========================================================
+   8. INVERNADERO (todo lo de "Tu invernadero" en el inicio)
+   ========================================================== */
+
+/* ----- 8.1 Botón "Crear invernadero" (cuando todavía no hay uno) ----- */
+
 .invernadero-cta {
   background: var(--color-surface);
   border: 1px dashed var(--color-border);
@@ -404,6 +458,8 @@ ul {
 .invernadero-cta button:hover {
   background: var(--color-text);
 }
+
+/* ----- 8.2 Tarjeta del invernadero (foto, nombre, temperatura, botones) ----- */
 
 .invernadero-card {
   background: var(--color-surface);
@@ -486,6 +542,8 @@ ul {
   color: var(--color-text) !important;
   border: 1px solid var(--color-border) !important;
 }
+
+/* ----- 8.3 Ventana para crear o editar el invernadero y elegir fondo ----- */
 
 .invernadero-modal-overlay {
   position: fixed;
@@ -570,6 +628,8 @@ ul {
   background: var(--color-text);
 }
 
+/* ----- 8.4 Horario de riego sugerido ----- */
+
 .horarios-riego {
   padding: 0 20px 16px;
 }
@@ -616,6 +676,8 @@ ul {
   border-radius: 999px;
 }
 
+/* ----- 8.5 Estado del cielo con ícono ----- */
+
 .invernadero-card-cielo {
   display: flex;
   align-items: center;
@@ -636,6 +698,8 @@ ul {
   height: 100%;
   display: block;
 }
+
+/* ----- 8.6 Alertas de helada y ventilación ----- */
 
 .invernadero-alertas {
   display: flex;
@@ -663,6 +727,8 @@ ul {
   color: #8a5a1f;
   border-color: #f3d8b3;
 }
+
+/* ----- 8.7 Mini pronóstico de 3 días ----- */
 
 .pronostico-invernadero {
   display: grid;
@@ -712,6 +778,8 @@ ul {
   color: var(--color-text);
 }
 
+/* ----- 8.8 Consejos según las plantas ----- */
+
 .invernadero-tips {
   padding: 4px 20px 16px;
 }
@@ -732,6 +800,8 @@ ul {
   color: var(--color-text-muted);
 }
 
+/* ----- 8.9 Subir foto propia (dentro de la ventana) ----- */
+
 .fondo-subir-label {
   display: block;
   margin-top: 10px;
@@ -748,6 +818,10 @@ ul {
 .fondo-option-personalizada {
   border-style: dashed;
 }
+
+/* ==========================================================
+   9. INICIO: NOVEDADES DEL PROYECTO
+   ========================================================== */
 
 .updates-grid {
   display: grid;
@@ -784,6 +858,10 @@ ul {
   margin: 8px 0 0;
 }
 
+/* ==========================================================
+   10. FRANJA VERDE DE ARRIBA EN CADA PÁGINA (Pronóstico, Mapa, Nosotros, Contacto)
+   ========================================================== */
+
 .page-header {
   background: var(--color-primary-dark);
   color: #fff;
@@ -800,6 +878,10 @@ ul {
   color: rgba(255, 255, 255, 0.8);
 }
 
+/* ==========================================================
+   11. CUADRO PUNTEADO DE "EN PREPARACIÓN"
+   ========================================================== */
+
 .placeholder-box {
   background: var(--color-surface);
   border: 1px dashed var(--color-border);
@@ -808,6 +890,10 @@ ul {
   text-align: center;
   color: var(--color-text-muted);
 }
+
+/* ==========================================================
+   12. AgrIA (botón redondo y ventana del chat)
+   ========================================================== */
 
 .ia-widget-toggle {
   position: fixed;
@@ -960,6 +1046,8 @@ ul {
   background: var(--color-text);
 }
 
+/* ----- 12.1 AgrIA en celular ----- */
+
 @media (max-width: 480px) {
   .ia-panel {
     right: 16px;
@@ -973,6 +1061,10 @@ ul {
     bottom: 16px;
   }
 }
+
+/* ==========================================================
+   13. FORMULARIOS (Contacto, y los campos de la ventana del invernadero)
+   ========================================================== */
 
 .contact-form {
   max-width: 480px;
@@ -1036,6 +1128,10 @@ ul {
   font-size: 0.85rem;
   color: var(--color-text-muted);
 }
+
+/* ==========================================================
+   14. FOOTER (pie de página)
+   ========================================================== */
 
 .site-footer {
   background: var(--color-primary-dark);
@@ -1104,6 +1200,14 @@ ul {
   text-align: center;
 }
 
+.site-footer .brand-icon {
+  color: #cfe9fb;
+}
+
+/* ==========================================================
+   15. CELULAR Y TABLET (cómo se acomoda el inicio y el menú en pantallas chicas)
+   ========================================================== */
+
 @media (max-width: 860px) {
   .hero-grid {
     grid-template-columns: 1fr;
@@ -1148,6 +1252,10 @@ ul {
   }
 }
 
+/* ==========================================================
+   16. PÁGINA PRONÓSTICO (los 7 días)
+   ========================================================== */
+
 .pronostico-top {
   display: flex;
   align-items: center;
@@ -1166,6 +1274,8 @@ ul {
   font-size: 0.85rem;
   color: var(--color-text-muted);
 }
+
+/* ----- 16.1 Grilla de tarjetas (7 en compu, 4 en tablet, 2 en celular) ----- */
 
 .pronostico-grid {
   display: grid;
@@ -1188,6 +1298,8 @@ ul {
 .pronostico-vacio {
   color: var(--color-text-muted);
 }
+
+/* ----- 16.2 Tarjeta de cada día ----- */
 
 .dia-card {
   background: var(--color-surface);
@@ -1282,6 +1394,8 @@ ul {
   line-height: 1.4;
 }
 
+/* ----- 16.3 Colores del consejo de cada día ----- */
+
 .consejo-normal {
   background: #eaf6ec;
   color: #2f6b3a;
@@ -1307,9 +1421,9 @@ ul {
   color: #4d4d4d;
 }
 
-.site-footer .brand-icon {
-  color: #cfe9fb;
-}
+/* ==========================================================
+   17. PÁGINA NOSOTROS (proyecto y equipo)
+   ========================================================== */
 
 .sobre-proyecto {
   max-width: 760px;
@@ -1321,6 +1435,8 @@ ul {
   color: var(--color-text-muted);
   line-height: 1.7;
 }
+
+/* ----- 17.1 Grilla del equipo (3 en compu, 2 en tablet, 1 en celular) ----- */
 
 .equipo-grid {
   display: grid;
@@ -1339,6 +1455,8 @@ ul {
     grid-template-columns: 1fr;
   }
 }
+
+/* ----- 17.2 Tarjeta de cada integrante ----- */
 
 .miembro-card {
   background: var(--color-surface);
