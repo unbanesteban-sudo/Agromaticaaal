@@ -1310,3 +1310,98 @@ ul {
 .site-footer .brand-icon {
   color: #cfe9fb;
 }
+
+.sobre-proyecto {
+  max-width: 760px;
+  margin-bottom: 48px;
+}
+
+.sobre-proyecto p {
+  margin: 0 0 12px;
+  color: var(--color-text-muted);
+  line-height: 1.7;
+}
+
+.equipo-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+}
+
+@media (max-width: 900px) {
+  .equipo-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 600px) {
+  .equipo-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.miembro-card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  transition: box-shadow 0.15s ease, border-color 0.15s ease;
+}
+
+.miembro-card:hover {
+  box-shadow: var(--shadow-md);
+  border-color: var(--color-primary-dark);
+}
+
+.miembro-top {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.miembro-avatar {
+  width: 56px;
+  height: 56px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: var(--color-primary-soft);
+  color: var(--color-primary-dark);
+  border: 2px solid var(--color-primary-dark);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 1.1rem;
+}
+
+.miembro-top h3 {
+  margin: 0;
+  font-size: 1.15rem;
+  color: var(--color-primary-dark);
+}
+
+.miembro-nombre {
+  margin: 2px 0 0;
+  font-size: 0.85rem;
+  color: var(--color-text-muted);
+}
+
+.miembro-rol {
+  align-self: flex-start;
+  background: var(--color-primary);
+  color: #fff;
+  font-size: 0.78rem;
+  font-weight: 600;
+  padding: 4px 12px;
+  border-radius: 999px;
+}
+
+.miembro-texto {
+  margin: 0;
+  font-size: 0.9rem;
+  line-height: 1.6;
+  color: var(--color-text-muted);
+}
