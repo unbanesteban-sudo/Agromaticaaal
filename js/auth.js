@@ -1,12 +1,12 @@
-function firebaseEstaConfigurado() {
-  return typeof firebase !== "undefined" &&
-    typeof firebaseConfig !== "undefined" &&
-    firebaseConfig.apiKey &&
-    firebaseConfig.apiKey !== "PEGAR_ACA";
-}
+// Lo explica: Roga
+// Chicos, esto protege las páginas: si alguien entra sin haber iniciado sesión,
+// lo mandamos a login.html. Si ya entró, arriba a la derecha mostramos su nombre
+// y el botón Salir. Las cuentas las maneja Firebase (de Google).
+// Si no hay internet (por ejemplo en la red del profe) Firebase no carga, y en ese
+// caso dejamos ver la página igual para que no quede trabada.
 
 function iniciarFirebase() {
-  if (!firebaseEstaConfigurado()) {
+  if (typeof firebase === "undefined") {
     return false;
   }
   if (firebase.apps.length === 0) {
@@ -19,46 +19,20 @@ function nombreDelUsuario(usuario) {
   if (usuario.isAnonymous) {
     return "Invitado";
   }
-  if (usuario.displayName) {
-    return usuario.displayName;
-  }
-  return usuario.email.split("@")[0];
-}
-
-function cuandoCargueLaPagina(funcion) {
-  if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", funcion);
-  } else {
-    funcion();
-  }
+  return usuario.displayName || usuario.email.split("@")[0];
 }
 
 function mostrarUsuario(usuario) {
-  var caja = document.getElementById("userBox");
-  if (!caja) {
-    return;
-  }
-
   var nombre = nombreDelUsuario(usuario);
-  caja.innerHTML = "";
+  var caja = document.getElementById("userBox");
 
-  var avatar = document.createElement("span");
-  avatar.className = "user-avatar";
-  avatar.textContent = nombre.charAt(0).toUpperCase();
+  caja.innerHTML =
+    "<span class=\"user-avatar\"></span>" +
+    "<span class=\"user-nombre\"></span>" +
+    "<button type=\"button\" class=\"user-salir\" onclick=\"cerrarSesion()\">Salir</button>";
 
-  var texto = document.createElement("span");
-  texto.className = "user-nombre";
-  texto.textContent = nombre;
-
-  var boton = document.createElement("button");
-  boton.type = "button";
-  boton.className = "user-salir";
-  boton.textContent = "Salir";
-  boton.setAttribute("onclick", "cerrarSesion()");
-
-  caja.appendChild(avatar);
-  caja.appendChild(texto);
-  caja.appendChild(boton);
+  caja.querySelector(".user-avatar").textContent = nombre.charAt(0).toUpperCase();
+  caja.querySelector(".user-nombre").textContent = nombre;
 }
 
 function cerrarSesion() {
@@ -69,7 +43,6 @@ function cerrarSesion() {
 
 function protegerPagina() {
   if (!iniciarFirebase()) {
-    console.warn("[Agromatical] Firebase no está configurado, la página se muestra sin login.");
     return;
   }
 
@@ -80,14 +53,14 @@ function protegerPagina() {
       window.location.href = "login.html";
       return;
     }
-
     document.documentElement.classList.remove("esperando-login");
-    cuandoCargueLaPagina(function () {
-      mostrarUsuario(usuario);
-    });
-  });
-}
 
-if (window.location.pathname.indexOf("login.html") === -1) {
-  protegerPagina();
+    if (document.readyState === "loading") {
+      document.addEventListener("DOMContentLoaded", function () {
+        mostrarUsuario(usuario);
+      });
+    } else {
+      mostrarUsuario(usuario);
+    }
+  });
 }

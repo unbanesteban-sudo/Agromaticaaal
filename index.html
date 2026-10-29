@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Agromatical — Pronóstico del tiempo</title>
+  <title>Agromatical — Cuidado de invernaderos</title>
   <meta name="description" content="Agromatical, tecnología para cuidar tu invernadero.">
   <link rel="icon" href="assets/favicon.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -15,6 +15,7 @@
   <script src="https://www.gstatic.com/firebasejs/12.19.0/firebase-auth-compat.js"></script>
   <script src="js/firebase-config.js"></script>
   <script src="js/auth.js"></script>
+  <script>protegerPagina();</script>
 </head>
 <body>
 
@@ -52,7 +53,7 @@
             <p class="hero-lema">Tecnología que cultiva el futuro</p>
           </div>
           <div class="search-form">
-            <input type="text" id="citySearchInput" placeholder="Buscar ciudad..." autocomplete="off">
+            <input type="text" id="citySearchInput" placeholder="Buscar ciudad..." autocomplete="off" onkeypress="teclaBuscador(event)">
             <button type="button" onclick="buscarClima()">Buscar</button>
           </div>
         </div>
@@ -60,11 +61,7 @@
         <div class="hero-grid">
           <div class="weather-card" id="weatherCard">
             <div class="weather-card-main">
-              <div class="weather-icon" id="weatherIcon" aria-hidden="true">
-                <svg width="34" height="34" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M7 17a4 4 0 0 1 0-8 5.5 5.5 0 0 1 10.8 1.2A3.7 3.7 0 0 1 17 17H7Z" fill="currentColor"/>
-                </svg>
-              </div>
+              <div class="weather-icon" id="weatherIcon" aria-hidden="true"></div>
               <div>
                 <div class="weather-location" id="weatherLocation">Cutral Có</div>
                 <div class="weather-temp"><span id="weatherTemp">--</span></div>
@@ -76,7 +73,7 @@
               <div class="weather-detail"><span>Humedad</span><strong><span id="weatherHumedad">--</span>%</strong></div>
               <div class="weather-detail"><span>Presión</span><strong><span id="weatherPresion">--</span> hPa</strong></div>
               <div class="weather-detail"><span>Viento</span><strong><span id="weatherViento">--</span> km/h</strong></div>
-              <div class="weather-detail"><span>Visibilidad</span><strong><span id="weatherVisibilidad">--</span> km</strong></div>
+              <div class="weather-detail"><span>Lluvia</span><strong><span id="weatherLluvia">--</span> mm</strong></div>
             </div>
 
             <div class="weather-state">
@@ -92,7 +89,7 @@
       </div>
     </section>
 
-    <section class="section" style="padding-bottom:0;">
+    <section class="section section-sin-abajo" id="tu-invernadero">
       <div class="container">
         <h2 class="section-title">Tu invernadero</h2>
 
@@ -224,26 +221,18 @@
             <p>Ubicación y temperatura en tiempo real (Open-Meteo).</p>
           </a>
 
-          <a class="quick-link-card" href="#" data-pending="true">
+          <a class="quick-link-card" href="#tu-invernadero">
             <div class="quick-link-icon">
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 2a6 6 0 0 0-6 6v3.3L4 15v1h16v-1l-2-3.7V8a6 6 0 0 0-6-6Zm0 20a2.5 2.5 0 0 0 2.45-2h-4.9A2.5 2.5 0 0 0 12 22Z" fill="currentColor"/></svg>
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M4 20C4 10 10 4 20 4c0 10-6 16-16 16z" fill="currentColor"/></svg>
             </div>
-            <h3>Alertas</h3>
-            <p>Avisos por temperatura o humedad extrema (a futuro).</p>
-          </a>
-
-          <a class="quick-link-card" href="#" data-pending="true">
-            <div class="quick-link-icon">
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M4 20V10h3v10H4Zm6.5 0V4h3v16h-3ZM17 20v-7h3v7h-3Z" fill="currentColor"/></svg>
-            </div>
-            <h3>Estadísticas</h3>
-            <p>Historial de mediciones (a futuro).</p>
+            <h3>Tu invernadero</h3>
+            <p>Datos de adentro, horarios de riego y el chat con AgrIA.</p>
           </a>
         </div>
       </div>
     </section>
 
-    <section class="section" style="padding-top:0;">
+    <section class="section section-sin-arriba">
       <div class="container">
         <h2 class="section-title">Novedades del proyecto</h2>
         <div class="updates-grid">
@@ -265,7 +254,14 @@
             <div class="update-card-media"></div>
             <div class="update-card-body">
               <time>Etapa 3</time>
-              <h3>Mapa, alertas y asistente de ayuda</h3>
+              <h3>Invernadero, AgrIA y login con Firebase</h3>
+            </div>
+          </article>
+          <article class="update-card">
+            <div class="update-card-media"></div>
+            <div class="update-card-body">
+              <time>Etapa 4</time>
+              <h3>Conexión con el servidor del profe</h3>
             </div>
           </article>
         </div>
@@ -301,7 +297,9 @@
       <div class="footer-col">
         <h5>Datos</h5>
         <ul>
-          <li><span class="footer-note">Fuente: Open-Meteo (API pública)</span></li>
+          <li><span class="footer-note">Clima: Open-Meteo</span></li>
+          <li><span class="footer-note">Sensores: servidor del profe</span></li>
+          <li><span class="footer-note">Cuentas: Firebase</span></li>
         </ul>
       </div>
     </div>
@@ -374,20 +372,17 @@
         <label>Elegí un fondo</label>
         <div class="fondo-picker" id="fondoPicker"></div>
         <label class="fondo-subir-label" for="fondoArchivoInput">O subí una foto tuya desde tu galería</label>
-        <input type="file" id="fondoArchivoInput" class="fondo-archivo-input" accept="image/*" onchange="cargarFotoInvernadero(event)">
+        <input type="file" id="fondoArchivoInput" class="fondo-archivo-input" accept="image/*" onchange="cargarFoto(event)">
       </div>
 
       <button type="button" class="invernadero-btn-guardar" onclick="guardarInvernadero()">Guardar invernadero</button>
     </div>
   </div>
 
-  <script>
-    document.getElementById("footerYear").innerText = new Date().getFullYear();
-  </script>
-
   <script src="js/main.js"></script>
   <script src="js/api.js"></script>
-  <script src="js/weather-icons.js"></script>
+  <script src="js/iconos-clima.js"></script>
+  <script src="js/reglas-riego.js"></script>
   <script src="js/invernadero.js"></script>
   <script src="js/sensores.js"></script>
   <script src="js/asistente-ia.js"></script>
@@ -398,6 +393,8 @@
   <script src="js/mapa.js"></script>
   <script>
     iniciarMapa("mapaHero", 13);
+    mostrarInvernadero();
+    iniciarServidorDelProfe();
   </script>
 </body>
 </html>

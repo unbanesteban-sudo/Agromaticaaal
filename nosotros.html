@@ -13,6 +13,7 @@
   <script src="https://www.gstatic.com/firebasejs/12.19.0/firebase-auth-compat.js"></script>
   <script src="js/firebase-config.js"></script>
   <script src="js/auth.js"></script>
+  <script>protegerPagina();</script>
 </head>
 <body>
 
@@ -53,7 +54,7 @@
       <div class="container">
         <div class="sobre-proyecto">
           <h2 class="section-title">Sobre el proyecto</h2>
-          <p>Agromatical es una página pensada para ayudar a cuidar un invernadero. Muestra el clima en tiempo real, el pronóstico de los próximos 7 días y, a partir de esos datos, arma horarios de riego, avisa si hay riesgo de helada o si hace falta ventilar, y da consejos según las plantas que tengas.</p>
+          <p>Agromatical es una página para cuidar un invernadero. Muestra la temperatura, la humedad y la luz de adentro (desde el servidor del profe), el clima de afuera y el pronóstico de 7 días (desde Open-Meteo). Con esos datos arma los horarios de riego, avisa si hay riesgo de helada o si hace falta ventilar, y tiene a AgrIA, un asistente con inteligencia artificial para hacerle preguntas sobre las plantas.</p>
           <p>Es un proyecto escolar hecho en equipo, donde cada integrante tuvo un rol distinto.</p>
         </div>
 
@@ -68,7 +69,7 @@
               </div>
             </div>
             <span class="miembro-rol">Backend</span>
-            <p class="miembro-texto">Se encargó de la parte que no se ve: conectar la página con Open-Meteo para traer el clima real, armar el pronóstico de 7 días, generar los horarios de riego automáticos y conectar a AgrIA, el asistente con inteligencia artificial.</p>
+            <p class="miembro-texto">Se encargó de la parte que no se ve: conectar la página con Open-Meteo para el clima de afuera, con el servidor del profe para los datos de adentro del invernadero, y armar y conectar a AgrIA, el asistente con inteligencia artificial.</p>
           </article>
 
           <article class="miembro-card">
@@ -80,7 +81,7 @@
               </div>
             </div>
             <span class="miembro-rol">Coordinador</span>
-            <p class="miembro-texto">Organizó al equipo: repartió las tareas, marcó los tiempos de entrega y se aseguró de que cada parte del proyecto avanzara. También fue el nexo con el profe para saber qué se esperaba del trabajo.</p>
+            <p class="miembro-texto">Organizó al equipo: repartió las tareas, marcó los tiempos de entrega y fue el nexo con el profe. También se ocupó del login con Firebase y de que todos tengan el proyecto en GitHub.</p>
           </article>
 
           <article class="miembro-card">
@@ -92,7 +93,7 @@
               </div>
             </div>
             <span class="miembro-rol">Frontend</span>
-            <p class="miembro-texto">Se ocupó de cómo se ve la página: el diseño, los colores, las tarjetas y que todo se adapte bien al celular. Si algo se ve prolijo y fácil de usar, pasó por sus manos.</p>
+            <p class="miembro-texto">Se ocupó de cómo se ve la página: el diseño con los colores del logo, las tarjetas, la parte de crear tu invernadero y que todo se adapte bien al celular.</p>
           </article>
 
           <article class="miembro-card">
@@ -104,7 +105,7 @@
               </div>
             </div>
             <span class="miembro-rol">Analista funcional</span>
-            <p class="miembro-texto">Definió qué tenía que hacer la página y para quién. Ayudó a llevar la idea de una página de clima a una herramienta para cuidar un invernadero, decidiendo qué datos mostrar y qué consejos darle al usuario.</p>
+            <p class="miembro-texto">Definió qué tenía que hacer la página y para quién. Armó las reglas que usa la página: cuándo conviene regar, cuándo avisar de una helada o de mucho calor, y los consejos para cada planta.</p>
           </article>
 
           <article class="miembro-card">
@@ -116,7 +117,7 @@
               </div>
             </div>
             <span class="miembro-rol">Tester</span>
-            <p class="miembro-texto">Probó cada función de la página: el buscador de ciudades, crear y editar el invernadero, los horarios de riego. Cada vez que algo fallaba, lo reportaba para que se pudiera arreglar.</p>
+            <p class="miembro-texto">Probó cada función de la página: crear y editar el invernadero, el chat con AgrIA y el formulario de contacto. Cada vez que algo fallaba, lo reportaba para que se pudiera arreglar.</p>
           </article>
 
           <article class="miembro-card">
@@ -128,7 +129,7 @@
               </div>
             </div>
             <span class="miembro-rol">Tester</span>
-            <p class="miembro-texto">Revisó que la página funcione bien en distintos navegadores y celulares, y probó el pronóstico, el mapa y las alertas con distintas ciudades para encontrar errores antes de la entrega.</p>
+            <p class="miembro-texto">Revisó que la página funcione bien en distintos navegadores y celulares, y probó el pronóstico de 7 días, el mapa y la planilla de Excel con distintas ciudades para encontrar errores antes de la entrega.</p>
           </article>
         </div>
       </div>
@@ -164,7 +165,9 @@
       <div class="footer-col">
         <h5>Datos</h5>
         <ul>
-          <li><span class="footer-note">Fuente: Open-Meteo (API pública)</span></li>
+          <li><span class="footer-note">Clima: Open-Meteo</span></li>
+          <li><span class="footer-note">Sensores: servidor del profe</span></li>
+          <li><span class="footer-note">Cuentas: Firebase</span></li>
         </ul>
       </div>
     </div>
@@ -173,10 +176,6 @@
       <p>&copy; <span id="footerYear"></span> Agromatical — Agromática Ada Lovelace</p>
     </div>
   </footer>
-
-  <script>
-    document.getElementById("footerYear").innerText = new Date().getFullYear();
-  </script>
 
   <script src="js/main.js"></script>
 </body>

@@ -1,137 +1,81 @@
-var SENSOR_CONFIG = {
+// Lo explica: Roman
+// Chicos, esta es la conexión con el servidor del profe (la Raspberry del taller).
+// Cada 3 segundos le pedimos la temperatura, la humedad y la luz de ADENTRO del
+// invernadero. Es una IP de la red local (192.168.4.1), así que solo anda estando
+// conectados a la red de la escuela. Si no responde, mostramos "Sin conexión".
+
+var SERVIDOR_PROFE = {
   url: "http://192.168.4.1/",
   cadaMs: 3000,
   esperaMaxMs: 2500
 };
 
-var IP_SERVIDOR_KEY = "agromaticalIpPlaca";
+var datosDelProfe = null;
+var conectadoAlProfe = false;
+var esperandoRespuesta = false;
 
-var ultimoSensor = null;
-var sensorConectado = false;
-var consultandoSensor = false;
-var avisoSinConexionMostrado = false;
-
-function cargarIpGuardada() {
-  try {
-    var guardada = localStorage.getItem(IP_SERVIDOR_KEY);
-    if (guardada) {
-      SENSOR_CONFIG.url = guardada;
-    }
-  } catch (error) {
-    return;
-  }
-}
-
-function ipSinFormato() {
-  return SENSOR_CONFIG.url.replace("http://", "").replace(/\/+$/, "");
+function hayConexionConElProfe() {
+  return conectadoAlProfe && datosDelProfe !== null;
 }
 
 function cambiarIpPlaca() {
-  var nueva = prompt("Escribí la IP del servidor del profe:", ipSinFormato());
+  var ipActual = SERVIDOR_PROFE.url.replace("http://", "").replace("/", "");
+  var nueva = prompt("Escribí la IP del servidor del profe:", ipActual);
   if (!nueva) {
     return;
   }
-
-  nueva = nueva.trim().replace("http://", "").replace(/\/+$/, "");
-  SENSOR_CONFIG.url = "http://" + nueva + "/";
-  try {
-    localStorage.setItem(IP_SERVIDOR_KEY, SENSOR_CONFIG.url);
-  } catch (error) {
-    console.warn("[Agromatical] No se pudo guardar la IP del servidor.");
-  }
-  mostrarIpPlaca();
-  consultarDatosInvernadero();
+  SERVIDOR_PROFE.url = "http://" + nueva.trim() + "/";
+  localStorage.setItem("agromaticalIpProfe", SERVIDOR_PROFE.url);
+  setTextoSiExiste("sensorIp", nueva.trim());
+  consultarServidorDelProfe();
 }
 
-function mostrarIpPlaca() {
-  setTextoSiExiste("sensorIp", ipSinFormato());
-}
-
-function numeroODefecto(valor, defecto) {
-  var numero = parseFloat(valor);
-  return isNaN(numero) ? defecto : numero;
-}
-
-function evaluarEstadoPlanta(tempActual) {
+function mostrarEstadoPlanta() {
   var datos = leerInvernadero();
-  var badge = document.getElementById("estadoBadge");
-  var mensaje = document.getElementById("estadoMensaje");
   var caja = document.getElementById("estadoPlanta");
 
-  if (!datos || !badge || !mensaje || !caja) {
-    return;
-  }
-
-  if (!sensorConectado || tempActual === null || tempActual === undefined) {
+  if (!hayConexionConElProfe() || !datos) {
     caja.className = "estado-planta";
-    badge.textContent = "SIN DATOS";
-    mensaje.textContent = "No hay conexión con el servidor del profe (" + ipSinFormato() + "). Esa dirección solo funciona conectado a la red de la escuela.";
+    setTextoSiExiste("estadoBadge", "SIN DATOS");
+    setTextoSiExiste("estadoMensaje", "No hay conexión con el servidor del profe. Solo funciona conectado a la red de la escuela.");
     setTextoSiExiste("estadoRango", "");
     return;
   }
 
-  var ideal = numeroODefecto(datos.tempIdeal, 22);
-  var margenAtencion = numeroODefecto(datos.margenAtencion, 3);
-  var margenCritico = numeroODefecto(datos.margenCritico, 6);
-  var diferencia = Math.abs(tempActual - ideal);
+  var temperatura = datosDelProfe.temperatura;
+  var estado = estadoDeLaPlanta(temperatura, datos.tempIdeal, datos.margenAtencion, datos.margenCritico);
 
-  setTextoSiExiste("estadoRango", "Rango ideal: " + (ideal - margenAtencion).toFixed(1) + " - " + (ideal + margenAtencion).toFixed(1) + " °C · Ahora: " + tempActual.toFixed(1) + " °C");
-
-  if (diferencia >= margenCritico) {
-    caja.className = "estado-planta estado-critico";
-    badge.textContent = "CRÍTICO";
-    mensaje.textContent = "¡Atención! La temperatura está " + (tempActual > ideal ? "demasiado alta" : "demasiado baja") + " para tus plantas.";
-  } else if (diferencia >= margenAtencion) {
-    caja.className = "estado-planta estado-atencion";
-    badge.textContent = "NECESITA ATENCIÓN";
-    mensaje.textContent = "La temperatura se está alejando del rango ideal.";
-  } else {
-    caja.className = "estado-planta estado-normal";
-    badge.textContent = "NORMAL";
-    mensaje.textContent = "El ambiente está dentro de las condiciones ideales para tus plantas.";
-  }
+  caja.className = "estado-planta " + estado.clase;
+  setTextoSiExiste("estadoBadge", estado.etiqueta);
+  setTextoSiExiste("estadoMensaje", estado.mensaje);
+  setTextoSiExiste("estadoRango", "Rango ideal: " + (datos.tempIdeal - datos.margenAtencion) + " a " + (datos.tempIdeal + datos.margenAtencion) + " °C · Ahora: " + temperatura.toFixed(1) + " °C");
 }
 
-function actualizarNotaTemperatura(temperatura) {
-  var nota = document.getElementById("sensorTempNota");
-  if (!nota) {
-    return;
-  }
-  if (temperatura === null) {
-    nota.className = "kpi-nota";
-    nota.textContent = "";
-  } else if (temperatura >= 18 && temperatura <= 26) {
-    nota.className = "kpi-nota verde";
-    nota.textContent = "Rango óptimo (18 - 26 °C)";
-  } else {
-    nota.className = "kpi-nota amarillo";
-    nota.textContent = "Fuera del rango óptimo";
-  }
-}
+// Los dos avisos que pidió el profe: temperatura entre 18 y 26 °C, y luz menor a 50.
+function mostrarNotas(temperatura, luz) {
+  var notaTemp = document.getElementById("sensorTempNota");
+  var notaLuz = document.getElementById("sensorLuzNota");
 
-function actualizarNotaLuz(luz) {
-  var nota = document.getElementById("sensorLuzNota");
-  if (!nota) {
-    return;
-  }
-  if (luz === null) {
-    nota.className = "kpi-nota";
-    nota.textContent = "";
-  } else if (luz < 50) {
-    nota.className = "kpi-nota amarillo";
-    nota.textContent = "Luminosidad baja";
+  if (temperatura >= 18 && temperatura <= 26) {
+    notaTemp.className = "kpi-nota verde";
+    notaTemp.textContent = "Rango óptimo (18 - 26 °C)";
   } else {
-    nota.className = "kpi-nota verde";
-    nota.textContent = "Luminosidad adecuada";
+    notaTemp.className = "kpi-nota amarillo";
+    notaTemp.textContent = "Fuera del rango óptimo";
+  }
+
+  if (luz < 50) {
+    notaLuz.className = "kpi-nota amarillo";
+    notaLuz.textContent = "Luminosidad baja";
+  } else {
+    notaLuz.className = "kpi-nota verde";
+    notaLuz.textContent = "Luminosidad adecuada";
   }
 }
 
 function mostrarConexion() {
   var etiqueta = document.getElementById("sensorConexion");
-  if (!etiqueta) {
-    return;
-  }
-  if (sensorConectado) {
+  if (conectadoAlProfe) {
     etiqueta.className = "sensor-conexion sensor-conectado";
     etiqueta.textContent = "Conectado al servidor del profe";
   } else {
@@ -140,96 +84,72 @@ function mostrarConexion() {
   }
 }
 
-function recibirDatosSensor(temperatura, humedad, luz) {
-  sensorConectado = true;
-  ultimoSensor = {
-    temperatura: temperatura,
-    humedad: humedad,
-    luz: luz,
-    hora: new Date().toLocaleTimeString("es-AR", { hour: "2-digit", minute: "2-digit" })
+function llegaronDatos(datos) {
+  conectadoAlProfe = true;
+
+  // No sabemos si el profe manda "temperatura" o "temp", así que aceptamos los dos nombres.
+  datosDelProfe = {
+    temperatura: parseFloat(datos.temperatura !== undefined ? datos.temperatura : datos.temp),
+    humedad: parseFloat(datos.humedad !== undefined ? datos.humedad : datos.hum),
+    luz: parseFloat(datos.luz !== undefined ? datos.luz : datos.luminosidad)
   };
 
-  mostrarConexion();
-  setTextoSiExiste("sensorTemp", temperatura !== null ? temperatura.toFixed(1) : "--");
-  setTextoSiExiste("sensorHum", humedad !== null ? Math.round(humedad) : "--");
-  setTextoSiExiste("sensorLuz", luz !== null ? Math.round(luz) : "--");
-  setTextoSiExiste("sensorHora", ultimoSensor.hora);
-
-  actualizarNotaTemperatura(temperatura);
-  actualizarNotaLuz(luz);
-  evaluarEstadoPlanta(temperatura);
-
-  if (typeof actualizarClimaInvernadero === "function") {
-    actualizarClimaInvernadero(ultimoClimaMostrado || {});
-  }
-}
-
-function sinConexionConServidor(error) {
-  var estabaConectado = sensorConectado;
-  sensorConectado = false;
-
-  if (!avisoSinConexionMostrado) {
-    console.warn("[Agromatical] No se pudo conectar con el servidor del profe (" + SENSOR_CONFIG.url + "):", error);
-    avisoSinConexionMostrado = true;
-  }
+  setTextoSiExiste("sensorTemp", datosDelProfe.temperatura.toFixed(1));
+  setTextoSiExiste("sensorHum", Math.round(datosDelProfe.humedad));
+  setTextoSiExiste("sensorLuz", Math.round(datosDelProfe.luz));
+  setTextoSiExiste("sensorHora", new Date().toLocaleTimeString("es-AR", { hour: "2-digit", minute: "2-digit" }));
 
   mostrarConexion();
-  evaluarEstadoPlanta(null);
+  mostrarNotas(datosDelProfe.temperatura, datosDelProfe.luz);
+  mostrarEstadoPlanta();
+  actualizarClimaInvernadero();
+}
 
-  if (!ultimoSensor) {
-    setTextoSiExiste("sensorTemp", "--");
-    setTextoSiExiste("sensorHum", "--");
-    setTextoSiExiste("sensorLuz", "--");
-  }
+function sinConexion() {
+  var estabaConectado = conectadoAlProfe;
+  conectadoAlProfe = false;
+  mostrarConexion();
+  mostrarEstadoPlanta();
 
-  if (estabaConectado && typeof actualizarClimaInvernadero === "function") {
-    actualizarClimaInvernadero(ultimoClimaMostrado || {});
+  if (estabaConectado) {
+    actualizarClimaInvernadero();
   }
 }
 
-function leerValor(datos, nombres) {
-  for (var i = 0; i < nombres.length; i++) {
-    var valor = datos[nombres[i]];
-    if (valor !== undefined && valor !== null && !isNaN(parseFloat(valor))) {
-      return parseFloat(valor);
-    }
-  }
-  return null;
-}
-
-function consultarDatosInvernadero() {
-  if (consultandoSensor || !leerInvernadero()) {
+function consultarServidorDelProfe() {
+  if (esperandoRespuesta || !leerInvernadero()) {
     return;
   }
 
-  consultandoSensor = true;
+  esperandoRespuesta = true;
   var controller = new AbortController();
   var timeoutId = setTimeout(function () {
     controller.abort();
-  }, SENSOR_CONFIG.esperaMaxMs);
+  }, SERVIDOR_PROFE.esperaMaxMs);
 
-  fetch(SENSOR_CONFIG.url, { signal: controller.signal })
+  fetch(SERVIDOR_PROFE.url, { signal: controller.signal })
     .then(function (respuesta) {
       return respuesta.json();
     })
     .then(function (datos) {
       clearTimeout(timeoutId);
-      consultandoSensor = false;
-      avisoSinConexionMostrado = false;
-      recibirDatosSensor(
-        leerValor(datos, ["temperatura", "temp"]),
-        leerValor(datos, ["humedad", "hum"]),
-        leerValor(datos, ["luz", "luminosidad"])
-      );
+      esperandoRespuesta = false;
+      llegaronDatos(datos);
     })
-    .catch(function (error) {
+    .catch(function () {
       clearTimeout(timeoutId);
-      consultandoSensor = false;
-      sinConexionConServidor(error);
+      esperandoRespuesta = false;
+      sinConexion();
     });
 }
 
-cargarIpGuardada();
-mostrarIpPlaca();
-consultarDatosInvernadero();
-setInterval(consultarDatosInvernadero, SENSOR_CONFIG.cadaMs);
+function iniciarServidorDelProfe() {
+  var ipGuardada = localStorage.getItem("agromaticalIpProfe");
+  if (ipGuardada) {
+    SERVIDOR_PROFE.url = ipGuardada;
+  }
+  setTextoSiExiste("sensorIp", SERVIDOR_PROFE.url.replace("http://", "").replace("/", ""));
+
+  consultarServidorDelProfe();
+  setInterval(consultarServidorDelProfe, SERVIDOR_PROFE.cadaMs);
+}

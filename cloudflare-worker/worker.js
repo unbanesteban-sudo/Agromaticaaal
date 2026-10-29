@@ -1,3 +1,8 @@
+// Lo explica: Roman
+// Chicos, este es el servidor de AgrIA. No corre en la página: está subido a Cloudflare
+// Workers (gratis). Recibe la pregunta desde asistente-ia.js, se la pasa a un modelo de
+// inteligencia artificial de Cloudflare (Llama 3.1) y devuelve la respuesta.
+
 const MODELO = "@cf/meta/llama-3.1-8b-instruct-fp8";
 
 const MAX_TOKENS_RESPUESTA = 700;

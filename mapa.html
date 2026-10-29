@@ -14,6 +14,7 @@
   <script src="https://www.gstatic.com/firebasejs/12.19.0/firebase-auth-compat.js"></script>
   <script src="js/firebase-config.js"></script>
   <script src="js/auth.js"></script>
+  <script>protegerPagina();</script>
 </head>
 <body>
 
@@ -52,10 +53,10 @@
 
     <section class="section">
       <div class="container">
-        <div class="map-card" style="min-height:480px;">
-          <div class="map-leaflet" id="mapaCompleto" style="height:480px;"></div>
+        <div class="map-card">
+          <div class="map-leaflet mapa-grande" id="mapaCompleto"></div>
         </div>
-        <p class="footer-note" style="margin-top:12px; color: var(--color-text-muted); font-size:0.85rem;">
+        <p class="mapa-nota">
           El círculo se mueve y cambia de color según la temperatura real (datos de Open-Meteo): azul (frío), verde (templado) o rojo (calor). Gris mientras no hay datos.
         </p>
       </div>
@@ -90,7 +91,9 @@
       <div class="footer-col">
         <h5>Datos</h5>
         <ul>
-          <li><span class="footer-note">Fuente: Open-Meteo (API pública)</span></li>
+          <li><span class="footer-note">Clima: Open-Meteo</span></li>
+          <li><span class="footer-note">Sensores: servidor del profe</span></li>
+          <li><span class="footer-note">Cuentas: Firebase</span></li>
         </ul>
       </div>
     </div>
@@ -99,10 +102,6 @@
       <p>&copy; <span id="footerYear"></span> Agromatical — Agromática Ada Lovelace</p>
     </div>
   </footer>
-
-  <script>
-    document.getElementById("footerYear").innerText = new Date().getFullYear();
-  </script>
 
   <script src="js/main.js"></script>
   <script src="js/api.js"></script>

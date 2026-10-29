@@ -1,15 +1,16 @@
-/* ÍNDICE (buscá el número o el nombre con Ctrl+F)
+/* Lo explica: Ailin
+   ÍNDICE (buscá el número o el nombre con Ctrl+F)
    1. VARIABLES (colores, bordes, sombras y fuente de toda la página)
    2. BASE (estilos generales que usan todas las páginas)
    3. HEADER (barra de arriba con el logo y el menú)
    4. INICIO: CLIMA ACTUAL (título, buscador y tarjeta del clima)
    5. INICIO: CUADRO DEL MAPA
    6. SECCIONES Y TÍTULOS VERDES
-   7. INICIO: ACCESOS RÁPIDOS (las 4 tarjetas)
+   7. INICIO: ACCESOS RÁPIDOS (las 3 tarjetas)
    8. INVERNADERO (todo lo de "Tu invernadero" en el inicio)
    9. INICIO: NOVEDADES DEL PROYECTO
    10. FRANJA VERDE DE ARRIBA EN CADA PÁGINA (Pronóstico, Mapa, Nosotros, Contacto)
-   11. CUADRO PUNTEADO DE "EN PREPARACIÓN"
+   11. AJUSTES CHICOS (espacios entre secciones y el mapa grande)
    12. AgrIA (botón redondo y ventana del chat)
    13. FORMULARIOS (Contacto, y los campos de la ventana del invernadero)
    14. FOOTER (pie de página)
@@ -143,11 +144,6 @@ ul {
 
 .brand-name span {
   color: var(--color-primary-light);
-}
-
-.brand-icon {
-  color: var(--color-primary);
-  display: inline-flex;
 }
 
 .main-nav {
@@ -302,6 +298,11 @@ ul {
   flex-shrink: 0;
 }
 
+.weather-icon svg {
+  width: 42px;
+  height: 42px;
+}
+
 .weather-temp {
   font-family: var(--font-titulos);
   font-size: 2.6rem;
@@ -319,11 +320,6 @@ ul {
 .weather-location {
   font-weight: 600;
   font-size: 1.05rem;
-}
-
-.weather-updated {
-  font-size: 0.8rem;
-  color: var(--color-text-muted);
 }
 
 .weather-details {
@@ -383,21 +379,6 @@ ul {
   justify-content: center;
 }
 
-.map-placeholder {
-  width: 100%;
-  height: 100%;
-  min-height: 320px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  color: var(--color-text-muted);
-  font-size: 0.9rem;
-  padding: 24px;
-  background:
-    repeating-linear-gradient(45deg, #f7f7f7, #f7f7f7 10px, #eeeeee 10px, #eeeeee 20px);
-}
-
 .map-leaflet {
   width: 100%;
   height: 320px;
@@ -432,7 +413,7 @@ ul {
 }
 
 /* ==========================================================
-   7. INICIO: ACCESOS RÁPIDOS (las 4 tarjetas)
+   7. INICIO: ACCESOS RÁPIDOS (las 3 tarjetas)
    ========================================================== */
 
 .quick-links {
@@ -1086,7 +1067,6 @@ ul {
 
 /* ----- 8.10 Botón para descargar la planilla de riego (Excel) ----- */
 
-
 .btn-planilla {
   margin-top: 14px;
   border: 2px solid var(--color-primary-light);
@@ -1274,6 +1254,12 @@ ul {
     linear-gradient(135deg, #1f6f96, #2b8fbf 60%, #5bb6dd);
 }
 
+.update-card:nth-child(4) .update-card-media {
+  background:
+    repeating-linear-gradient(115deg, rgba(255, 255, 255, 0.14) 0 14px, transparent 14px 46px),
+    linear-gradient(135deg, #5b8c2a, #7cc142 60%, #a6d66b);
+}
+
 .update-card:nth-child(3) .update-card-media {
   background:
     repeating-linear-gradient(115deg, rgba(124, 193, 66, 0.18) 0 14px, transparent 14px 46px),
@@ -1319,16 +1305,25 @@ ul {
 }
 
 /* ==========================================================
-   11. CUADRO PUNTEADO DE "EN PREPARACIÓN"
+   11. AJUSTES CHICOS (espacios entre secciones y el mapa grande)
    ========================================================== */
 
-.placeholder-box {
-  background: var(--color-surface);
-  border: 1px dashed var(--color-border);
-  border-radius: var(--radius-md);
-  padding: 40px 24px;
-  text-align: center;
+.section-sin-abajo {
+  padding-bottom: 0;
+}
+
+.section-sin-arriba {
+  padding-top: 0;
+}
+
+.mapa-grande {
+  height: 480px;
+}
+
+.mapa-nota {
+  margin-top: 12px;
   color: var(--color-text-muted);
+  font-size: 0.85rem;
 }
 
 /* ==========================================================
@@ -1759,10 +1754,6 @@ ul {
   }
 }
 
-.pronostico-vacio {
-  color: var(--color-text-muted);
-}
-
 /* ----- 16.2 Tarjeta de cada día ----- */
 
 .dia-card {
@@ -1875,14 +1866,19 @@ ul {
   color: #3d4590;
 }
 
+.consejo-humedo {
+  background: #e8f2fb;
+  color: #2d5c8a;
+}
+
+.consejo-espera {
+  background: var(--color-surface-alt);
+  color: var(--color-text-muted);
+}
+
 .consejo-calor {
   background: #fdf1e3;
   color: #8a5a1f;
-}
-
-.consejo-viento {
-  background: #f2f2f2;
-  color: #4d4d4d;
 }
 
 /* ==========================================================

@@ -1,11 +1,13 @@
-var CONTACT_CONFIG = {
-  endpoint: "https://httpbin.org/post" 
-};
+// Lo explica: Thiago
+// Chicos, el formulario no tiene un servidor propio: cuando tocan Enviar se abre el
+// mail de la persona (Gmail, Outlook, etc.) con el mensaje ya escrito para nosotros.
+
+var MAIL_DEL_EQUIPO = "agromatical@gmail.com";
 
 function enviarContacto() {
-  var nombre = document.getElementById("contactNombre").value;
-  var email = document.getElementById("contactEmail").value;
-  var mensaje = document.getElementById("contactMensaje").value;
+  var nombre = document.getElementById("contactNombre").value.trim();
+  var email = document.getElementById("contactEmail").value.trim();
+  var mensaje = document.getElementById("contactMensaje").value.trim();
   var estado = document.getElementById("contactStatus");
 
   if (!nombre || !email || !mensaje) {
@@ -13,22 +15,17 @@ function enviarContacto() {
     return;
   }
 
-  estado.innerText = "Enviando...";
+  if (email.indexOf("@") === -1) {
+    estado.innerText = "Revisá el mail, le falta el @.";
+    return;
+  }
 
-  fetch(CONTACT_CONFIG.endpoint, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ nombre: nombre, email: email, mensaje: mensaje })
-  })
-    .then(function (respuesta) {
-      return respuesta.json();
-    })
-    .then(function (data) {
-      console.log("[Agromatical] Respuesta del servidor:", data);
-      estado.innerText = "¡Mensaje enviado! Gracias " + nombre + ".";
-    })
-    .catch(function (error) {
-      console.error("[Agromatical] Error al enviar el contacto:", error);
-      estado.innerText = "No se pudo enviar. Probá de nuevo más tarde.";
-    });
+  var asunto = "Consulta de " + nombre + " desde Agromatical";
+  var cuerpo = mensaje + "\n\n" + nombre + " (" + email + ")";
+
+  window.location.href = "mailto:" + MAIL_DEL_EQUIPO +
+    "?subject=" + encodeURIComponent(asunto) +
+    "&body=" + encodeURIComponent(cuerpo);
+
+  estado.innerText = "Se abrió tu mail con el mensaje listo. Solo falta tocar Enviar ahí.";
 }

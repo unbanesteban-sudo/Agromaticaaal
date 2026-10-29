@@ -13,6 +13,7 @@
   <script src="https://www.gstatic.com/firebasejs/12.19.0/firebase-auth-compat.js"></script>
   <script src="js/firebase-config.js"></script>
   <script src="js/auth.js"></script>
+  <script>protegerPagina();</script>
 </head>
 <body>
 
@@ -54,7 +55,7 @@
         <div class="pronostico-top">
           <h2 class="section-title pronostico-titulo" id="pronosticoCiudad">Próximos 7 días</h2>
           <div class="search-form">
-            <input type="text" id="citySearchInput" placeholder="Buscar ciudad..." autocomplete="off">
+            <input type="text" id="citySearchInput" placeholder="Buscar ciudad..." autocomplete="off" onkeypress="teclaBuscador(event)">
             <button type="button" onclick="buscarClima()">Buscar</button>
           </div>
         </div>
@@ -93,7 +94,9 @@
       <div class="footer-col">
         <h5>Datos</h5>
         <ul>
-          <li><span class="footer-note">Fuente: Open-Meteo (API pública)</span></li>
+          <li><span class="footer-note">Clima: Open-Meteo</span></li>
+          <li><span class="footer-note">Sensores: servidor del profe</span></li>
+          <li><span class="footer-note">Cuentas: Firebase</span></li>
         </ul>
       </div>
     </div>
@@ -103,13 +106,10 @@
     </div>
   </footer>
 
-  <script>
-    document.getElementById("footerYear").innerText = new Date().getFullYear();
-  </script>
-
   <script src="js/main.js"></script>
   <script src="js/api.js"></script>
-  <script src="js/weather-icons.js"></script>
+  <script src="js/iconos-clima.js"></script>
+  <script src="js/reglas-riego.js"></script>
   <script src="js/pronostico.js"></script>
 </body>
 </html>

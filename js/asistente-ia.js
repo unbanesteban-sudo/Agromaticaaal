@@ -1,130 +1,77 @@
-var SYSTEM_PROMPT_BASE = "Sos AgrIA, el asistente de Agromatical, un sistema de monitoreo de " +
-  "temperatura y humedad para agricultores. Respondés dudas sobre riego, cuidado de " +
-  "cultivos, y cómo interpretar la temperatura y humedad que muestra la página. " +
-  "Sos claro y breve (unos pocos párrafos como mucho), y si no estás seguro de algo " +
-  "específico del cultivo del usuario, lo aclarás en vez de inventar. Respondés " +
-  "siempre en español.";
+// Lo explica: Roman
+// Chicos, esto conecta la página con AgrIA, nuestra inteligencia artificial.
+// La IA corre en un servidor nuestro de Cloudflare (está en cloudflare-worker/worker.js).
+// Nosotros le mandamos la pregunta + los datos que está mostrando la página, así
+// responde con el clima y las plantas reales del usuario en vez de inventar.
+// También maneja la burbujita flotante del chat (abajo a la derecha).
 
-function contextoInvernadero() {
-  if (typeof leerInvernadero !== "function") {
-    return "";
-  }
+var AGRIA_URL = "https://agria.unbanesteban.workers.dev/";
 
-  var datos = leerInvernadero();
-  if (!datos) {
-    return "";
-  }
+var INSTRUCCIONES_AGRIA = "Sos AgrIA, el asistente de Agromatical, una página para cuidar invernaderos. " +
+  "Respondés dudas sobre riego y cuidado de plantas, en español, claro y breve. " +
+  "Si no estás seguro de algo, lo decís en vez de inventar. " +
+  "Nunca inventes temperaturas: usá solo los datos que te pasa la página.";
 
-  var texto = " El usuario tiene un invernadero llamado \"" + datos.nombre + "\"";
-  if (datos.plantas) {
-    texto += " donde cultiva: " + datos.plantas + ".";
+function datosParaAgria() {
+  var texto = "";
+  var afuera = ultimoClimaMostrado;
+
+  if (afuera) {
+    texto += " Clima de afuera en " + afuera.ciudad + " (Open-Meteo): " + Math.round(afuera.temperatura) + " °C, humedad " +
+      Math.round(afuera.humedad) + "%, viento " + Math.round(afuera.viento) + " km/h, cielo " + afuera.descripcion + ".";
   } else {
-    texto += ", pero todavía no cargó qué plantas tiene.";
+    texto += " Todavía no cargó el clima de afuera.";
   }
 
-  if (typeof sensorConectado !== "undefined" && sensorConectado && ultimoSensor) {
-    texto += " Los sensores del invernadero (servidor del profe) marcan ahora: " +
-      (ultimoSensor.temperatura !== null ? ultimoSensor.temperatura.toFixed(1) + " °C" : "sin dato de temperatura") +
-      (ultimoSensor.humedad !== null ? ", humedad " + Math.round(ultimoSensor.humedad) + "%" : "") +
-      (ultimoSensor.luz !== null ? ", luminosidad " + Math.round(ultimoSensor.luz) : "") +
-      ". Esa es la temperatura de ADENTRO del invernadero; el dato de Open-Meteo es la de afuera.";
+  var invernadero = (typeof leerInvernadero === "function") ? leerInvernadero() : null;
+  if (invernadero) {
+    texto += " El usuario tiene un invernadero llamado \"" + invernadero.nombre + "\" con: " + (invernadero.plantas || "plantas sin cargar") + ".";
+
+    if (hayConexionConElProfe()) {
+      texto += " Adentro del invernadero (servidor del profe) hay " + datosDelProfe.temperatura.toFixed(1) + " °C, humedad " +
+        Math.round(datosDelProfe.humedad) + "% y luz " + Math.round(datosDelProfe.luz) + ".";
+    }
+
+    var datos = datosParaElRiego();
+    var riego = riegoSegunClima(datos.temperatura, datos.humedad, datos.precipitacion, null, null);
+    texto += " Riego sugerido hoy: " + (riego.horarios.length > 0 ? riego.horarios.join(" y ") : "no regar") + " (" + riego.mensaje + ").";
   }
 
-  if (typeof generarHorariosRiego === "function" && typeof climaParaRiego === "function") {
-    var riego = generarHorariosRiego(climaParaRiego());
-    texto += " El horario de riego que sugiere la página para hoy es: " +
-      (riego.horarios.length > 0 ? riego.horarios.join(" y ") : "no regar") +
-      " (" + riego.mensaje + ").";
-  }
-
-  texto += " Cuando te pregunte por sus plantas o su invernadero, usá estos datos y respondé pensando en esas plantas.";
   return texto;
 }
 
-function construirSystemPrompt() {
-  var prompt = SYSTEM_PROMPT_BASE + contextoInvernadero();
+// Le mandamos a nuestro servidor las instrucciones y la conversación. A la última
+// pregunta le pegamos los datos de la página, porque si no la IA a veces se los olvida.
+function preguntarAAgria(mensajes) {
+  var conversacion = mensajes.slice();
+  var ultima = conversacion[conversacion.length - 1];
+  conversacion[conversacion.length - 1] = {
+    role: "user",
+    content: "[Datos de la página:" + datosParaAgria() + "]\n\n" + ultima.content
+  };
 
-  if (typeof ultimoClimaMostrado !== "undefined" && ultimoClimaMostrado &&
-      ultimoClimaMostrado.temperatura !== null && ultimoClimaMostrado.temperatura !== undefined) {
-    var c = ultimoClimaMostrado;
-    prompt += " Dato real que está mostrando la página ahora mismo (fuente: Open-Meteo) — " +
-      "ciudad: " + c.ciudad + ", temperatura: " + Math.round(c.temperatura) + "°C" +
-      (c.humedad !== null && c.humedad !== undefined ? ", humedad: " + Math.round(c.humedad) + "%" : "") +
-      (c.viento !== null && c.viento !== undefined ? ", viento: " + Math.round(c.viento) + " km/h" : "") +
-      (c.precipitacion !== null && c.precipitacion !== undefined ? ", lluvia: " + c.precipitacion + " mm" : "") +
-      (c.descripcion ? ", cielo: " + c.descripcion : "") +
-      ", actualizado a las " + c.actualizado + ". Si te preguntan por la temperatura o el clima actual, " +
-      "usá exactamente este dato — nunca inventes ni calcules otro número por tu cuenta, aunque te " +
-      "pregunten por otra ciudad: si preguntan por otra ciudad distinta a \"" + c.ciudad + "\", aclará que " +
-      "en la página sólo tenés el dato de esa ciudad en este momento.";
-  } else {
-    prompt += " Todavía no hay ningún dato de clima cargado en la página. Si te preguntan por la " +
-      "temperatura o el clima actual, aclará que no tenés ese dato disponible en este momento " +
-      "(por ejemplo, porque la página está cargando o no hay conexión) en vez de inventar un valor.";
-  }
-
-  return prompt;
-}
-
-function datoRealComoTexto() {
-  if (typeof ultimoClimaMostrado !== "undefined" && ultimoClimaMostrado &&
-      ultimoClimaMostrado.temperatura !== null && ultimoClimaMostrado.temperatura !== undefined) {
-    var c = ultimoClimaMostrado;
-    return "[Dato real mostrado en la página ahora mismo — ciudad: " + c.ciudad +
-      ", temperatura: " + Math.round(c.temperatura) + "°C" +
-      (c.humedad !== null && c.humedad !== undefined ? ", humedad: " + Math.round(c.humedad) + "%" : "") +
-      (c.viento !== null && c.viento !== undefined ? ", viento: " + Math.round(c.viento) + " km/h" : "") +
-      (c.precipitacion !== null && c.precipitacion !== undefined ? ", lluvia: " + c.precipitacion + " mm" : "") +
-      (c.descripcion ? ", cielo: " + c.descripcion : "") +
-      ", actualizado " + c.actualizado + ". Si la pregunta es sobre el clima o la temperatura actual, " +
-      "usá este dato exacto en tu respuesta, no digas que no tenés acceso.]";
-  }
-  return "[Todavía no hay ningún dato de clima cargado en la página. Si la pregunta es sobre la " +
-    "temperatura o el clima actual, aclarar que no está disponible en este momento.]";
-}
-
-var AI_CONFIG = {
-  endpoint: "https://agria.unbanesteban.workers.dev/"
-};
-
-var MAX_HISTORIAL = 16;
-
-var historialIA = [];
-var iaEstaPensando = false;
-
-function preguntarAlAsistente(mensajes) {
-  if (!AI_CONFIG.endpoint) {
-    console.warn("[AgrIA] Falta configurar AI_CONFIG.endpoint en js/asistente-ia.js");
-    return Promise.resolve("El asistente todavía no está conectado.");
-  }
-
-  return fetch(AI_CONFIG.endpoint, {
+  return fetch(AGRIA_URL, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ system: construirSystemPrompt(), mensajes: mensajes })
+    body: JSON.stringify({ system: INSTRUCCIONES_AGRIA, mensajes: conversacion })
   })
     .then(function (respuesta) {
       return respuesta.json();
     })
     .then(function (data) {
-      if (data && data.respuesta) {
-        return data.respuesta;
-      }
-      if (data && data.error) {
-        return "Hubo un error consultando al asistente: " + data.error;
-      }
-      return "Hubo un error consultando al asistente.";
+      return data.respuesta || "Hubo un error consultando a AgrIA.";
     })
-    .catch(function (error) {
-      console.error("[AgrIA] Error al consultar el asistente:", error);
-      return "Hubo un error consultando al asistente. Revisá la conexión e intentá de nuevo.";
+    .catch(function () {
+      return "No me pude conectar. Revisá la conexión a internet e intentá de nuevo.";
     });
 }
+
+var historialBurbuja = [];
+var agriaPensando = false;
 
 function toggleAsistenteIA() {
   var panel = document.getElementById("iaPanel");
   panel.classList.toggle("open");
-
   if (panel.classList.contains("open")) {
     document.getElementById("iaInput").focus();
   }
@@ -140,47 +87,25 @@ function agregarBurbujaIA(texto, quien) {
   return burbuja;
 }
 
-function recortarHistorialIA() {
-  if (historialIA.length > MAX_HISTORIAL) {
-    historialIA = historialIA.slice(historialIA.length - MAX_HISTORIAL);
-  }
-}
-
 function enviarMensajeIA() {
-  if (iaEstaPensando) {
-    return;
-  }
-
   var input = document.getElementById("iaInput");
   var pregunta = input.value.trim();
-
-  if (!pregunta) {
+  if (!pregunta || agriaPensando) {
     return;
   }
 
   input.value = "";
   agregarBurbujaIA(pregunta, "user");
+  historialBurbuja.push({ role: "user", content: pregunta });
 
-  historialIA.push({ role: "user", content: pregunta });
-  recortarHistorialIA();
+  agriaPensando = true;
+  var pensando = agregarBurbujaIA("Pensando...", "asistente-pensando");
 
-  iaEstaPensando = true;
-  var burbujaPensando = agregarBurbujaIA("Pensando...", "asistente-pensando");
-
-  var mensajesParaAPI = historialIA.slice();
-  mensajesParaAPI[mensajesParaAPI.length - 1] = {
-    role: "user",
-    content: datoRealComoTexto() + "\n\n" + pregunta
-  };
-
-  preguntarAlAsistente(mensajesParaAPI).then(function (respuesta) {
-    burbujaPensando.remove();
+  preguntarAAgria(historialBurbuja.slice(-10)).then(function (respuesta) {
+    pensando.remove();
     agregarBurbujaIA(respuesta, "asistente");
-
-    historialIA.push({ role: "assistant", content: respuesta });
-    recortarHistorialIA();
-
-    iaEstaPensando = false;
+    historialBurbuja.push({ role: "assistant", content: respuesta });
+    agriaPensando = false;
   });
 }
 

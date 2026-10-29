@@ -13,6 +13,7 @@
   <script src="https://www.gstatic.com/firebasejs/12.19.0/firebase-auth-compat.js"></script>
   <script src="js/firebase-config.js"></script>
   <script src="js/auth.js"></script>
+  <script>protegerPagina();</script>
 </head>
 <body>
 
@@ -99,7 +100,9 @@
       <div class="footer-col">
         <h5>Datos</h5>
         <ul>
-          <li><span class="footer-note">Fuente: Open-Meteo (API pública)</span></li>
+          <li><span class="footer-note">Clima: Open-Meteo</span></li>
+          <li><span class="footer-note">Sensores: servidor del profe</span></li>
+          <li><span class="footer-note">Cuentas: Firebase</span></li>
         </ul>
       </div>
     </div>
@@ -108,10 +111,6 @@
       <p>&copy; <span id="footerYear"></span> Agromatical — Agromática Ada Lovelace</p>
     </div>
   </footer>
-
-  <script>
-    document.getElementById("footerYear").innerText = new Date().getFullYear();
-  </script>
 
   <script src="js/main.js"></script>
   <script src="js/contacto.js"></script>

@@ -1,3 +1,7 @@
+// Lo explica: Roga
+// Chicos, estos son los datos de NUESTRO proyecto en Firebase (console.firebase.google.com).
+// No es una contraseña: Firebase los hace públicos a propósito, por eso pueden estar en GitHub.
+
 var firebaseConfig = {
   apiKey: "AIzaSyD78rwqEUbhe9gIjoZ8Fr6QHzTNGbX4dHA",
   authDomain: "agromatical.firebaseapp.com",

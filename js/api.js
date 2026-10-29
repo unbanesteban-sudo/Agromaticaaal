@@ -1,14 +1,18 @@
+// Lo explica: Roman
+// Chicos, este archivo trae el clima de AFUERA desde Open-Meteo (una API gratis, sin clave).
+// Primero averigua la ciudad del usuario por su IP, y después pide el clima de ahora
+// y el pronóstico de 7 días. Lo usan el Inicio, el Pronóstico y el Mapa.
+
 var API_CONFIG = {
-  forecastUrl: "https://api.open-meteo.com/v1/forecast",
-  geocodingUrl: "https://geocoding-api.open-meteo.com/v1/search",
-  campos: "temperature_2m,relative_humidity_2m,pressure_msl,wind_speed_10m,precipitation,weather_code",
-  camposDiarios: "temperature_2m_max,temperature_2m_min,precipitation_sum,precipitation_probability_max,wind_speed_10m_max,weather_code",
+  climaUrl: "https://api.open-meteo.com/v1/forecast",
+  ciudadesUrl: "https://geocoding-api.open-meteo.com/v1/search",
+  datosDeAhora: "temperature_2m,relative_humidity_2m,pressure_msl,wind_speed_10m,precipitation,weather_code",
+  datosPorDia: "temperature_2m_max,temperature_2m_min,precipitation_sum,precipitation_probability_max,wind_speed_10m_max,weather_code",
   ciudadPorDefecto: "Cutral Co",
-  timeoutMs: 6000
+  esperaMaxMs: 6000
 };
 
 var ultimaUbicacion = null;
-
 var ultimoClimaMostrado = null;
 
 function setTextoSiExiste(id, texto) {
@@ -18,27 +22,31 @@ function setTextoSiExiste(id, texto) {
   }
 }
 
-function fetchConTimeout(url) {
+function redondeado(valor, unidad) {
+  if (valor === null || valor === undefined) {
+    return "--";
+  }
+  return Math.round(valor) + (unidad || "");
+}
+
+// Si Open-Meteo no contesta en 6 segundos, cortamos el pedido y mostramos el error.
+function pedirJSON(url) {
   var controller = new AbortController();
   var timeoutId = setTimeout(function () {
     controller.abort();
-  }, API_CONFIG.timeoutMs);
+  }, API_CONFIG.esperaMaxMs);
 
   return fetch(url, { signal: controller.signal })
     .then(function (respuesta) {
       clearTimeout(timeoutId);
       return respuesta.json();
-    })
-    .catch(function (error) {
-      clearTimeout(timeoutId);
-      throw error;
     });
 }
 
-function geocodificarCiudad(nombreCiudad) {
-  var url = API_CONFIG.geocodingUrl + "?name=" + encodeURIComponent(nombreCiudad) + "&count=1&language=es";
+function buscarCoordenadas(nombreCiudad) {
+  var url = API_CONFIG.ciudadesUrl + "?name=" + encodeURIComponent(nombreCiudad) + "&count=1&language=es";
 
-  return fetchConTimeout(url)
+  return pedirJSON(url)
     .then(function (data) {
       if (!data.results || data.results.length === 0) {
         return null;
@@ -46,60 +54,55 @@ function geocodificarCiudad(nombreCiudad) {
       var resultado = data.results[0];
       return { nombre: resultado.name, lat: resultado.latitude, lon: resultado.longitude };
     })
-    .catch(function (error) {
-      console.error("[Agromatical] Error buscando la ciudad:", error);
+    .catch(function () {
       return null;
     });
 }
 
-function descripcionWeatherCode(codigo) {
-  var descripciones = {
-    0: "Despejado",
-    1: "Mayormente despejado",
-    2: "Parcialmente nublado",
-    3: "Nublado",
-    45: "Nublado con niebla",
-    48: "Nublado con niebla",
-    51: "Llovizna",
-    53: "Llovizna",
-    55: "Llovizna",
-    56: "Llovizna helada",
-    57: "Llovizna helada",
-    61: "Lluvia",
-    63: "Lluvia",
-    65: "Lluvia",
-    66: "Lluvia helada",
-    67: "Lluvia helada",
-    71: "Nieve",
-    73: "Nieve",
-    75: "Nieve",
-    77: "Nieve granulada",
-    80: "Chubascos",
-    81: "Chubascos",
-    82: "Chubascos fuertes",
-    85: "Nevadas",
-    86: "Nevadas fuertes",
-    95: "Tormenta eléctrica",
-    96: "Tormenta con granizo",
-    99: "Tormenta con granizo"
-  };
-
-  if (descripciones[codigo] !== undefined) {
-    return descripciones[codigo];
+// Open-Meteo no manda "soleado" o "lluvia", manda un número (código WMO). Acá lo traducimos.
+function descripcionDelCodigo(codigo) {
+  if (codigo === 0) {
+    return "Despejado";
+  }
+  if (codigo === 1) {
+    return "Mayormente despejado";
+  }
+  if (codigo === 2) {
+    return "Parcialmente nublado";
+  }
+  if (codigo === 3 || codigo === 45 || codigo === 48) {
+    return "Nublado";
+  }
+  if (codigo >= 51 && codigo <= 57) {
+    return "Llovizna";
+  }
+  if (codigo >= 61 && codigo <= 67) {
+    return "Lluvia";
+  }
+  if (codigo >= 71 && codigo <= 77) {
+    return "Nieve";
+  }
+  if (codigo >= 80 && codigo <= 82) {
+    return "Chubascos";
+  }
+  if (codigo >= 85 && codigo <= 86) {
+    return "Nevadas";
+  }
+  if (codigo >= 95) {
+    return "Tormenta";
   }
   return "Sin dato";
 }
 
-function nombreDelDia(fecha, indice) {
-  if (indice === 0) {
+function nombreDelDia(fecha, numeroDeDia) {
+  if (numeroDeDia === 0) {
     return "Hoy";
   }
-  if (indice === 1) {
+  if (numeroDeDia === 1) {
     return "Mañana";
   }
   var dias = ["Domingo", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"];
-  var d = new Date(fecha + "T12:00:00");
-  return dias[d.getDay()];
+  return dias[new Date(fecha + "T12:00:00").getDay()];
 }
 
 function fechaCorta(fecha) {
@@ -107,186 +110,164 @@ function fechaCorta(fecha) {
   return partes[2] + "/" + partes[1];
 }
 
-function valorDiario(lista, i) {
-  if (lista && lista[i] !== undefined) {
-    return lista[i];
-  }
-  return null;
-}
-
-function fetchClimaPorCoordenadas(lat, lon) {
-  var url = API_CONFIG.forecastUrl + "?latitude=" + lat + "&longitude=" + lon +
-    "&current=" + API_CONFIG.campos +
-    "&daily=" + API_CONFIG.camposDiarios +
+function pedirClima(lat, lon) {
+  var url = API_CONFIG.climaUrl + "?latitude=" + lat + "&longitude=" + lon +
+    "&current=" + API_CONFIG.datosDeAhora +
+    "&daily=" + API_CONFIG.datosPorDia +
     "&forecast_days=7&timezone=auto";
 
-  return fetchConTimeout(url).then(function (data) {
-    var actual = data.current || {};
-    var diario = data.daily || {};
+  return pedirJSON(url).then(function (data) {
+    var ahora = data.current;
+    var dias = data.daily;
     var pronostico = [];
 
-    if (diario.time) {
-      for (var i = 0; i < diario.time.length && i < 7; i++) {
-        var codigoDia = valorDiario(diario.weather_code, i);
-        pronostico.push({
-          etiqueta: nombreDelDia(diario.time[i], i),
-          fecha: diario.time[i],
-          fechaCorta: fechaCorta(diario.time[i]),
-          tempMax: valorDiario(diario.temperature_2m_max, i),
-          tempMin: valorDiario(diario.temperature_2m_min, i),
-          precipitacion: valorDiario(diario.precipitation_sum, i),
-          probLluvia: valorDiario(diario.precipitation_probability_max, i),
-          viento: valorDiario(diario.wind_speed_10m_max, i),
-          codigo: codigoDia,
-          descripcion: descripcionWeatherCode(codigoDia)
-        });
-      }
+    for (var i = 0; i < dias.time.length; i++) {
+      pronostico.push({
+        etiqueta: nombreDelDia(dias.time[i], i),
+        fecha: dias.time[i],
+        fechaCorta: fechaCorta(dias.time[i]),
+        tempMax: dias.temperature_2m_max[i],
+        tempMin: dias.temperature_2m_min[i],
+        precipitacion: dias.precipitation_sum[i],
+        probLluvia: dias.precipitation_probability_max[i],
+        viento: dias.wind_speed_10m_max[i],
+        descripcion: descripcionDelCodigo(dias.weather_code[i])
+      });
     }
 
     return {
       lat: lat,
       lon: lon,
-      temperatura: actual.temperature_2m,
-      humedad: actual.relative_humidity_2m,
-      presion: actual.pressure_msl,
-      viento: actual.wind_speed_10m,
-      precipitacion: actual.precipitation,
-      codigoClima: actual.weather_code,
-      descripcion: descripcionWeatherCode(actual.weather_code),
+      temperatura: ahora.temperature_2m,
+      humedad: ahora.relative_humidity_2m,
+      presion: ahora.pressure_msl,
+      viento: ahora.wind_speed_10m,
+      precipitacion: ahora.precipitation,
+      descripcion: descripcionDelCodigo(ahora.weather_code),
       pronostico: pronostico,
       actualizado: new Date().toLocaleTimeString("es-AR", { hour: "2-digit", minute: "2-digit" })
     };
   });
 }
 
-function renderClima(ciudad, clima) {
-  ultimoClimaMostrado = {
-    ciudad: ciudad,
-    temperatura: clima.temperatura,
-    humedad: clima.humedad,
-    presion: clima.presion,
-    viento: clima.viento,
-    precipitacion: clima.precipitacion,
-    codigoClima: clima.codigoClima,
-    descripcion: clima.descripcion,
-    pronostico: clima.pronostico,
-    actualizado: clima.actualizado
-  };
+function mostrarClima(ciudad, clima) {
+  clima.ciudad = ciudad;
+  ultimoClimaMostrado = clima;
 
   setTextoSiExiste("weatherLocation", ciudad);
-  setTextoSiExiste("weatherTemp", (clima.temperatura !== null && clima.temperatura !== undefined) ? Math.round(clima.temperatura) + "°" : "--");
-  setTextoSiExiste("weatherHumedad", (clima.humedad !== null && clima.humedad !== undefined) ? Math.round(clima.humedad) : "--");
-  setTextoSiExiste("weatherPresion", (clima.presion !== null && clima.presion !== undefined) ? Math.round(clima.presion) : "--");
-  setTextoSiExiste("weatherViento", (clima.viento !== null && clima.viento !== undefined) ? Math.round(clima.viento) : "--");
-  setTextoSiExiste("weatherVisibilidad", "--");
+  setTextoSiExiste("weatherTemp", redondeado(clima.temperatura, "°"));
+  setTextoSiExiste("weatherHumedad", redondeado(clima.humedad));
+  setTextoSiExiste("weatherPresion", redondeado(clima.presion));
+  setTextoSiExiste("weatherViento", redondeado(clima.viento));
+  setTextoSiExiste("weatherLluvia", clima.precipitacion);
   setTextoSiExiste("weatherUpdated", clima.actualizado);
-  setTextoSiExiste("weatherDesc", "Datos de Open-Meteo");
+  setTextoSiExiste("weatherDesc", clima.descripcion);
   setTextoSiExiste("weatherEstado", "Datos actualizados");
 
-  if (typeof actualizarUbicacionMapa === "function") {
-    actualizarUbicacionMapa(clima.lat, clima.lon, ciudad);
+  var icono = document.getElementById("weatherIcon");
+  if (icono && typeof iconoDelClima === "function") {
+    icono.innerHTML = iconoDelClima(clima.descripcion);
   }
-  if (typeof actualizarColorClimaMapa === "function") {
-    actualizarColorClimaMapa(clima.temperatura);
+
+  // Este archivo lo usan varias páginas, así que antes de avisarle al mapa,
+  // al invernadero o al pronóstico me fijo que esa parte exista en la página.
+  if (typeof actualizarMapa === "function") {
+    actualizarMapa(clima.lat, clima.lon, ciudad, clima.temperatura);
   }
   if (typeof actualizarClimaInvernadero === "function") {
-    actualizarClimaInvernadero(clima);
+    actualizarClimaInvernadero();
   }
-  if (typeof renderizarPronosticoExtendido === "function") {
-    renderizarPronosticoExtendido(ciudad, clima.pronostico);
+  if (typeof mostrarPronosticoSemana === "function") {
+    mostrarPronosticoSemana(ciudad, clima.pronostico);
   }
 }
 
-function mostrarEstadoCargando(ciudad) {
+function mostrarCargando(ciudad) {
   setTextoSiExiste("weatherLocation", ciudad);
   setTextoSiExiste("weatherTemp", "--");
   setTextoSiExiste("weatherHumedad", "--");
   setTextoSiExiste("weatherPresion", "--");
   setTextoSiExiste("weatherViento", "--");
-  setTextoSiExiste("weatherVisibilidad", "--");
+  setTextoSiExiste("weatherLluvia", "--");
   setTextoSiExiste("weatherUpdated", "--");
   setTextoSiExiste("weatherDesc", "Buscando datos...");
   setTextoSiExiste("weatherEstado", "Conectando con Open-Meteo...");
 }
 
-function mostrarEstadoError(mensaje) {
+function mostrarError(mensaje) {
   var estado = document.getElementById("weatherEstado");
   if (estado) {
     estado.innerHTML = (mensaje || "No se pudo obtener el clima. Revisá tu conexión a internet.") +
       " <button type=\"button\" class=\"retry-link\" onclick=\"reintentarClima()\">Reintentar</button>";
   }
-
-  if (typeof actualizarColorClimaMapa === "function") {
-    actualizarColorClimaMapa(null);
-  }
 }
 
-function mostrarClimaEnUbicacion(ciudad, lat, lon) {
+function climaEnUbicacion(ciudad, lat, lon) {
   ultimaUbicacion = { ciudad: ciudad, lat: lat, lon: lon };
-  mostrarEstadoCargando(ciudad);
+  mostrarCargando(ciudad);
 
-  fetchClimaPorCoordenadas(lat, lon)
+  pedirClima(lat, lon)
     .then(function (clima) {
-      if (clima.temperatura === null || clima.temperatura === undefined) {
-        mostrarEstadoError();
-      } else {
-        renderClima(ciudad, clima);
-      }
+      mostrarClima(ciudad, clima);
     })
     .catch(function (error) {
       console.error("[Agromatical] Error al pedir el clima:", error);
-      mostrarEstadoError();
+      mostrarError();
     });
 }
 
 function reintentarClima() {
   if (ultimaUbicacion) {
-    mostrarClimaEnUbicacion(ultimaUbicacion.ciudad, ultimaUbicacion.lat, ultimaUbicacion.lon);
+    climaEnUbicacion(ultimaUbicacion.ciudad, ultimaUbicacion.lat, ultimaUbicacion.lon);
   } else {
-    detectarCiudadPorIP();
+    detectarCiudad();
   }
 }
 
-function mostrarClimaSegunCiudad(ciudad) {
+function climaDeCiudad(ciudad) {
   if (!ciudad) {
     ciudad = API_CONFIG.ciudadPorDefecto;
   }
 
-  mostrarEstadoCargando(ciudad);
+  mostrarCargando(ciudad);
 
-  geocodificarCiudad(ciudad).then(function (ubicacion) {
+  buscarCoordenadas(ciudad).then(function (ubicacion) {
     if (!ubicacion) {
-      mostrarEstadoError("No se encontró \"" + ciudad + "\". Probá con otro nombre.");
+      mostrarError("No se encontró \"" + ciudad + "\". Probá con otro nombre.");
       return;
     }
-    mostrarClimaEnUbicacion(ubicacion.nombre, ubicacion.lat, ubicacion.lon);
+    climaEnUbicacion(ubicacion.nombre, ubicacion.lat, ubicacion.lon);
   });
 }
 
 function buscarClima() {
   var ciudad = document.getElementById("citySearchInput").value;
-  mostrarClimaSegunCiudad(ciudad);
+  climaDeCiudad(ciudad);
 }
 
-function detectarCiudadPorIP() {
-  fetchConTimeout("https://ipapi.co/json/")
+function teclaBuscador(evento) {
+  if (evento.key === "Enter") {
+    buscarClima();
+  }
+}
+
+// ipapi.co nos dice desde qué ciudad entra el usuario. Si falla, usamos Cutral Có.
+function detectarCiudad() {
+  pedirJSON("https://ipapi.co/json/")
     .then(function (datos) {
-      var ciudad = datos.city || API_CONFIG.ciudadPorDefecto;
+      if (!datos.latitude || !datos.longitude) {
+        climaDeCiudad(API_CONFIG.ciudadPorDefecto);
+        return;
+      }
       var input = document.getElementById("citySearchInput");
       if (input) {
-        input.placeholder = ciudad;
+        input.placeholder = datos.city;
       }
-
-      if (datos.latitude && datos.longitude) {
-        mostrarClimaEnUbicacion(ciudad, datos.latitude, datos.longitude);
-      } else {
-        mostrarClimaSegunCiudad(API_CONFIG.ciudadPorDefecto);
-      }
+      climaEnUbicacion(datos.city, datos.latitude, datos.longitude);
     })
-    .catch(function (error) {
-      console.error("[Agromatical] No se pudo detectar la ciudad por IP:", error);
-      mostrarClimaSegunCiudad(API_CONFIG.ciudadPorDefecto);
+    .catch(function () {
+      climaDeCiudad(API_CONFIG.ciudadPorDefecto);
     });
 }
 
-detectarCiudadPorIP();
+detectarCiudad();

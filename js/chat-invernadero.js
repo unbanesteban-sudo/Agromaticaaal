@@ -1,39 +1,30 @@
-var CHAT_INVERNADERO_KEY = "agromaticalChatInvernadero";
-var MAX_MENSAJES_CHAT = 40;
-var MAX_MENSAJES_PARA_IA = 16;
-var chatInvernaderoPensando = false;
+// Lo explica: Thiago
+// Chicos, este es el chat con AgrIA que aparece abajo del invernadero. Cuando alguien
+// crea su invernadero, AgrIA lo saluda solo y le muestra su lista de plantas.
+// Los mensajes se guardan en localStorage para que no se borren al recargar.
+// Para responder usa preguntarAAgria(), que está en asistente-ia.js.
+
+var CLAVE_CHAT = "agromaticalChatInvernadero";
+var chatPensando = false;
 
 function leerChatInvernadero() {
-  try {
-    var guardado = localStorage.getItem(CHAT_INVERNADERO_KEY);
-    return guardado ? JSON.parse(guardado) : [];
-  } catch (error) {
-    return [];
-  }
+  var guardado = localStorage.getItem(CLAVE_CHAT);
+  return guardado ? JSON.parse(guardado) : [];
 }
 
 function guardarChatInvernadero(mensajes) {
-  if (mensajes.length > MAX_MENSAJES_CHAT) {
-    mensajes = mensajes.slice(mensajes.length - MAX_MENSAJES_CHAT);
-  }
-  try {
-    localStorage.setItem(CHAT_INVERNADERO_KEY, JSON.stringify(mensajes));
-  } catch (error) {
-    console.error("[AgrIA] No se pudo guardar el chat:", error);
-  }
+  localStorage.setItem(CLAVE_CHAT, JSON.stringify(mensajes.slice(-40)));
 }
 
 function borrarChatInvernadero() {
-  localStorage.removeItem(CHAT_INVERNADERO_KEY);
+  localStorage.removeItem(CLAVE_CHAT);
 }
 
+// Convierte "tomates, lechuga y frutillas" en una lista: Tomates / Lechuga / Frutillas.
 function separarPlantas(texto) {
   var lista = [];
-  if (!texto) {
-    return lista;
-  }
+  var partes = (texto || "").split(/,| y /);
 
-  var partes = texto.split(/,|;|\n|\sy\s|\se\s/i);
   for (var i = 0; i < partes.length; i++) {
     var planta = partes[i].trim();
     if (planta) {
@@ -43,19 +34,12 @@ function separarPlantas(texto) {
   return lista;
 }
 
-function textoRiegoDeHoy() {
-  if (typeof climaParaRiego !== "function" || typeof generarHorariosRiego !== "function") {
-    return "";
+function listaDePlantas(plantas) {
+  var texto = "";
+  for (var i = 0; i < plantas.length; i++) {
+    texto += "\n• " + plantas[i];
   }
-
-  var riego = generarHorariosRiego(climaParaRiego());
-  if (riego.horarios.length === 0 && riego.mensaje.indexOf("Esperando") === 0) {
-    return "";
-  }
-  if (riego.horarios.length > 0) {
-    return "Para hoy te recomiendo regar a las " + riego.horarios.join(" y ") + ".";
-  }
-  return "Para hoy: " + riego.mensaje;
+  return texto;
 }
 
 function mensajesDeBienvenida(datos) {
@@ -68,19 +52,14 @@ function mensajesDeBienvenida(datos) {
     ];
   }
 
-  var lista = "Esta es tu lista de plantas:";
-  for (var i = 0; i < plantas.length; i++) {
-    lista += "\n• " + plantas[i];
-  }
-
   return [
     "¡Wow, qué lindo \"" + datos.nombre + "\"! Soy AgrIA, tu asistente.",
-    lista,
-    "Vamos a empezar a cuidarlas juntos de hoy en adelante. " + textoRiegoDeHoy() + " Preguntame lo que quieras sobre tus plantas."
+    "Esta es tu lista de plantas:" + listaDePlantas(plantas),
+    "Vamos a empezar a cuidarlas juntos de hoy en adelante. Preguntame lo que quieras sobre tus plantas."
   ];
 }
 
-function crearBurbujaChatInv(texto, rol) {
+function crearBurbujaChat(texto, rol) {
   var lista = document.getElementById("chatInvMensajes");
   var burbuja = document.createElement("div");
   burbuja.className = "chat-inv-msg chat-inv-" + rol;
@@ -90,21 +69,15 @@ function crearBurbujaChatInv(texto, rol) {
   return burbuja;
 }
 
-function agregarMensajeChatInv(texto, rol) {
+function agregarMensajeChat(texto, rol) {
   var mensajes = leerChatInvernadero();
   mensajes.push({ rol: rol, texto: texto });
   guardarChatInvernadero(mensajes);
-  crearBurbujaChatInv(texto, rol);
+  crearBurbujaChat(texto, rol);
 }
 
 function mostrarChatInvernadero(datos) {
-  var chat = document.getElementById("chatInvernadero");
-  var lista = document.getElementById("chatInvMensajes");
-  if (!chat || !lista) {
-    return;
-  }
-
-  chat.style.display = "";
+  document.getElementById("chatInvernadero").style.display = "";
 
   var mensajes = leerChatInvernadero();
   if (mensajes.length === 0) {
@@ -115,81 +88,54 @@ function mostrarChatInvernadero(datos) {
     guardarChatInvernadero(mensajes);
   }
 
-  lista.innerHTML = "";
+  document.getElementById("chatInvMensajes").innerHTML = "";
   for (var j = 0; j < mensajes.length; j++) {
-    crearBurbujaChatInv(mensajes[j].texto, mensajes[j].rol);
+    crearBurbujaChat(mensajes[j].texto, mensajes[j].rol);
   }
 }
 
 function avisarCambioDePlantas(datos) {
   var plantas = separarPlantas(datos.plantas);
   var mensajes = leerChatInvernadero();
-
-  if (mensajes.length === 0) {
-    return;
-  }
-
-  var texto = "Vi que cambiaste tus plantas. ";
-  if (plantas.length === 0) {
-    texto += "Ahora no tengo ninguna anotada, agregalas cuando quieras.";
-  } else {
-    texto += "Tu lista nueva es:";
-    for (var i = 0; i < plantas.length; i++) {
-      texto += "\n• " + plantas[i];
-    }
-  }
+  var texto = (plantas.length === 0)
+    ? "Vi que borraste tus plantas. Agregalas cuando quieras."
+    : "Vi que cambiaste tus plantas. Tu lista nueva es:" + listaDePlantas(plantas);
 
   mensajes.push({ rol: "asistente", texto: texto });
   guardarChatInvernadero(mensajes);
 }
 
-function mensajesParaLaIA() {
-  var mensajes = leerChatInvernadero();
-  var resultado = [];
+// Pasamos el chat guardado al formato que entiende la IA (role: "user" o "assistant").
+function conversacionParaAgria() {
+  var mensajes = leerChatInvernadero().slice(-10);
+  var conversacion = [];
 
   for (var i = 0; i < mensajes.length; i++) {
-    resultado.push({
+    conversacion.push({
       role: (mensajes[i].rol === "usuario") ? "user" : "assistant",
       content: mensajes[i].texto
     });
   }
-
-  if (resultado.length > MAX_MENSAJES_PARA_IA) {
-    resultado = resultado.slice(resultado.length - MAX_MENSAJES_PARA_IA);
-  }
-  while (resultado.length > 0 && resultado[0].role !== "user") {
-    resultado.shift();
-  }
-
-  if (resultado.length > 0 && typeof datoRealComoTexto === "function") {
-    var ultimo = resultado[resultado.length - 1];
-    ultimo.content = datoRealComoTexto() + "\n\n" + ultimo.content;
-  }
-
-  return resultado;
+  return conversacion;
 }
 
 function enviarMensajeChatInvernadero() {
-  if (chatInvernaderoPensando) {
-    return;
-  }
-
   var input = document.getElementById("chatInvInput");
   var pregunta = input.value.trim();
-  if (!pregunta) {
+  if (!pregunta || chatPensando) {
     return;
   }
 
   input.value = "";
-  agregarMensajeChatInv(pregunta, "usuario");
+  agregarMensajeChat(pregunta, "usuario");
 
-  chatInvernaderoPensando = true;
-  var burbujaPensando = crearBurbujaChatInv("AgrIA está escribiendo...", "pensando");
+  chatPensando = true;
+  var pensando = crearBurbujaChat("AgrIA está escribiendo...", "pensando");
 
-  preguntarAlAsistente(mensajesParaLaIA()).then(function (respuesta) {
-    burbujaPensando.remove();
-    agregarMensajeChatInv(respuesta, "asistente");
-    chatInvernaderoPensando = false;
+  preguntarAAgria(conversacionParaAgria()).then(function (respuesta) {
+    pensando.remove();
+    agregarMensajeChat(respuesta, "asistente");
+    chatPensando = false;
   });
 }
 
@@ -202,9 +148,4 @@ function teclaChatInvernadero(evento) {
   if (evento.key === "Enter") {
     enviarMensajeChatInvernadero();
   }
-}
-
-var datosInvernaderoAlCargar = leerInvernadero();
-if (datosInvernaderoAlCargar) {
-  mostrarChatInvernadero(datosInvernaderoAlCargar);
 }
