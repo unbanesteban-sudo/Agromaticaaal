@@ -44,11 +44,14 @@ function separarPlantas(texto) {
 }
 
 function textoRiegoDeHoy() {
-  if (typeof ultimoClimaMostrado === "undefined" || !ultimoClimaMostrado || typeof generarHorariosRiego !== "function") {
+  if (typeof climaParaRiego !== "function" || typeof generarHorariosRiego !== "function") {
     return "";
   }
 
-  var riego = generarHorariosRiego(ultimoClimaMostrado);
+  var riego = generarHorariosRiego(climaParaRiego());
+  if (riego.horarios.length === 0 && riego.mensaje.indexOf("Esperando") === 0) {
+    return "";
+  }
   if (riego.horarios.length > 0) {
     return "Para hoy te recomiendo regar a las " + riego.horarios.join(" y ") + ".";
   }

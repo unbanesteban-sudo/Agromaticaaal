@@ -883,7 +883,215 @@ ul {
   border-style: dashed;
 }
 
+/* ----- 8.12 Sensores de la placa del profe (adentro del invernadero) ----- */
+
+.sensores {
+  padding: 18px 20px;
+  border-bottom: 1px solid var(--color-border);
+  background: linear-gradient(180deg, var(--color-primary-soft), var(--color-surface));
+}
+
+.sensores-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+
+.sensores-titulo,
+.afuera-titulo {
+  margin: 0;
+  font-size: 0.95rem;
+  color: var(--color-primary-dark);
+}
+
+.sensores-titulo small,
+.afuera-titulo small {
+  font-family: var(--font-base);
+  font-weight: 400;
+  color: var(--color-text-muted);
+  font-size: 0.78rem;
+}
+
+.afuera-titulo {
+  padding: 16px 20px 0;
+}
+
+.sensor-conexion {
+  font-size: 0.78rem;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: var(--color-surface-alt);
+  color: var(--color-text-muted);
+}
+
+.sensor-conectado {
+  background: #dcf2d3;
+  color: #2f6b3a;
+}
+
+.sensor-simulado {
+  background: #fdf1e3;
+  color: #8a5a1f;
+}
+
+.sensores-kpis {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+}
+
+.kpi {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.kpi-nombre {
+  font-size: 0.8rem;
+  color: var(--color-text-muted);
+}
+
+.kpi strong {
+  font-family: var(--font-titulos);
+  font-size: 1.5rem;
+  color: var(--color-text);
+}
+
+.kpi-nota {
+  font-size: 0.75rem;
+  font-weight: 700;
+  min-height: 1.1em;
+}
+
+.kpi-nota.verde {
+  color: #2f6b3a;
+}
+
+.kpi-nota.amarillo {
+  color: #b7791f;
+}
+
+.kpi-grafico {
+  position: relative;
+  height: 70px;
+  margin-top: 6px;
+}
+
+.estado-planta {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-top: 14px;
+  padding: 12px 14px;
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-left: 5px solid var(--color-border);
+}
+
+.estado-planta p {
+  margin: 0;
+  font-size: 0.9rem;
+}
+
+.estado-planta small {
+  color: var(--color-text-muted);
+  font-size: 0.78rem;
+}
+
+.estado-badge {
+  flex-shrink: 0;
+  font-size: 0.75rem;
+  font-weight: 800;
+  padding: 5px 10px;
+  border-radius: 999px;
+  background: var(--color-surface-alt);
+  color: var(--color-text-muted);
+}
+
+.estado-normal {
+  border-left-color: #4ade80;
+}
+
+.estado-normal .estado-badge {
+  background: #dcf2d3;
+  color: #2f6b3a;
+}
+
+.estado-atencion {
+  border-left-color: #fbbf24;
+}
+
+.estado-atencion .estado-badge {
+  background: #fdf1d0;
+  color: #8a5a1f;
+}
+
+.estado-critico {
+  border-left-color: #f87171;
+}
+
+.estado-critico .estado-badge {
+  background: #fde2e2;
+  color: #b3261e;
+}
+
+.sensor-placa {
+  margin: 10px 0 0;
+  font-size: 0.78rem;
+  color: var(--color-text-muted);
+}
+
+.sensor-placa button {
+  border: none;
+  background: none;
+  padding: 0;
+  color: var(--color-primary);
+  font-family: var(--font-base);
+  font-size: 0.78rem;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.form-fila-temp {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+
+.form-fila-temp div {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+.form-fila-temp label {
+  font-size: 0.78rem;
+}
+
+.form-ayuda {
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
+}
+
+@media (max-width: 640px) {
+  .sensores-kpis {
+    grid-template-columns: 1fr;
+  }
+}
+
 /* ----- 8.10 Botón para descargar la planilla de riego (Excel) ----- */
+
 
 .btn-planilla {
   margin-top: 14px;

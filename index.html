@@ -109,6 +109,46 @@
             </div>
           </div>
 
+          <div class="sensores">
+            <div class="sensores-top">
+              <h4 class="sensores-titulo">Adentro del invernadero <small>(sensores en vivo, cada 3 segundos)</small></h4>
+              <span class="sensor-conexion" id="sensorConexion">Buscando la placa...</span>
+            </div>
+
+            <div class="sensores-kpis">
+              <div class="kpi">
+                <span class="kpi-nombre">Temperatura</span>
+                <strong><span id="sensorTemp">--</span> °C</strong>
+                <small class="kpi-nota" id="sensorTempNota"></small>
+                <div class="kpi-grafico"><canvas id="graficoTemperatura"></canvas></div>
+              </div>
+              <div class="kpi">
+                <span class="kpi-nombre">Humedad</span>
+                <strong><span id="sensorHum">--</span> %</strong>
+                <small class="kpi-nota">&nbsp;</small>
+                <div class="kpi-grafico"><canvas id="graficoHumedad"></canvas></div>
+              </div>
+              <div class="kpi">
+                <span class="kpi-nombre">Luminosidad</span>
+                <strong><span id="sensorLuz">--</span></strong>
+                <small class="kpi-nota" id="sensorLuzNota"></small>
+                <div class="kpi-grafico"><canvas id="graficoLuminosidad"></canvas></div>
+              </div>
+            </div>
+
+            <div class="estado-planta" id="estadoPlanta">
+              <span class="estado-badge" id="estadoBadge">--</span>
+              <div>
+                <p id="estadoMensaje">Esperando datos de la placa...</p>
+                <small id="estadoRango"></small>
+              </div>
+            </div>
+
+            <p class="sensor-placa">Placa: <span id="sensorIp"></span> · Última lectura: <span id="sensorHora">--</span> · <button type="button" onclick="cambiarIpPlaca()">Cambiar IP</button></p>
+          </div>
+
+          <h4 class="afuera-titulo">Afuera <small>(Open-Meteo)</small></h4>
+
           <div class="invernadero-card-cielo" id="invernaderoCielo" style="display:none;">
             <span class="invernadero-cielo-icono" id="invernaderoCieloIcono"></span>
             <span id="invernaderoCieloTexto"></span>
@@ -316,6 +356,24 @@
       </div>
 
       <div class="form-field">
+        <div class="form-fila-temp">
+          <div>
+            <label for="invTempIdealInput">Temp. ideal (°C)</label>
+            <input type="number" id="invTempIdealInput" value="22" step="0.5">
+          </div>
+          <div>
+            <label for="invMargenAtencionInput">Avisar si se aleja</label>
+            <input type="number" id="invMargenAtencionInput" value="3" step="0.5" min="0.5">
+          </div>
+          <div>
+            <label for="invMargenCriticoInput">Crítico si se aleja</label>
+            <input type="number" id="invMargenCriticoInput" value="6" step="0.5" min="1">
+          </div>
+        </div>
+        <small class="form-ayuda">Más o menos: tomate 24°, frutilla 20°, lechuga 18°. Con 22° y márgenes de 3 y 6, entre 19° y 25° está todo bien.</small>
+      </div>
+
+      <div class="form-field">
         <label>Elegí un fondo</label>
         <div class="fondo-picker" id="fondoPicker"></div>
         <label class="fondo-subir-label" for="fondoArchivoInput">O subí una foto tuya desde tu galería</label>
@@ -334,6 +392,8 @@
   <script src="js/api.js"></script>
   <script src="js/weather-icons.js"></script>
   <script src="js/invernadero.js"></script>
+  <script src="js/lib/chart.umd.min.js"></script>
+  <script src="js/sensores.js"></script>
   <script src="js/asistente-ia.js"></script>
   <script src="js/chat-invernadero.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>

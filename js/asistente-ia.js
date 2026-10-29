@@ -22,8 +22,16 @@ function contextoInvernadero() {
     texto += ", pero todavía no cargó qué plantas tiene.";
   }
 
-  if (typeof generarHorariosRiego === "function" && typeof ultimoClimaMostrado !== "undefined" && ultimoClimaMostrado) {
-    var riego = generarHorariosRiego(ultimoClimaMostrado);
+  if (typeof ultimoSensor !== "undefined" && ultimoSensor && !ultimoSensor.simulado) {
+    texto += " Los sensores del invernadero (placa ESP32) marcan ahora: " +
+      (ultimoSensor.temperatura !== null ? ultimoSensor.temperatura.toFixed(1) + " °C" : "sin dato de temperatura") +
+      (ultimoSensor.humedad !== null ? ", humedad " + Math.round(ultimoSensor.humedad) + "%" : "") +
+      (ultimoSensor.luz !== null ? ", luminosidad " + Math.round(ultimoSensor.luz) : "") +
+      ". Esa es la temperatura de ADENTRO del invernadero; el dato de Open-Meteo es la de afuera.";
+  }
+
+  if (typeof generarHorariosRiego === "function" && typeof climaParaRiego === "function") {
+    var riego = generarHorariosRiego(climaParaRiego());
     texto += " El horario de riego que sugiere la página para hoy es: " +
       (riego.horarios.length > 0 ? riego.horarios.join(" y ") : "no regar") +
       " (" + riego.mensaje + ").";

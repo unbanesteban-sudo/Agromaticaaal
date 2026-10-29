@@ -182,17 +182,28 @@ function guardarInvernaderoEnStorage(datos) {
   }
 }
 
+function valorODefecto(valor, defecto) {
+  var numero = parseFloat(valor);
+  return isNaN(numero) ? defecto : numero;
+}
+
 function abrirModalInvernadero() {
   var datos = leerInvernadero();
 
   if (datos) {
     document.getElementById("invernaderoNombreInput").value = datos.nombre;
     document.getElementById("invernaderoPlantasInput").value = datos.plantas;
+    document.getElementById("invTempIdealInput").value = valorODefecto(datos.tempIdeal, 22);
+    document.getElementById("invMargenAtencionInput").value = valorODefecto(datos.margenAtencion, 3);
+    document.getElementById("invMargenCriticoInput").value = valorODefecto(datos.margenCritico, 6);
     fondoSeleccionadoInvernadero = datos.fondo;
     fotoPersonalizadaInvernadero = esFotoPersonalizada(datos.fondo) ? datos.fondo : null;
   } else {
     document.getElementById("invernaderoNombreInput").value = "";
     document.getElementById("invernaderoPlantasInput").value = "";
+    document.getElementById("invTempIdealInput").value = 22;
+    document.getElementById("invMargenAtencionInput").value = 3;
+    document.getElementById("invMargenCriticoInput").value = 6;
     fondoSeleccionadoInvernadero = FONDOS_INVERNADERO[0].id;
     fotoPersonalizadaInvernadero = null;
   }
@@ -219,11 +230,23 @@ function guardarInvernadero() {
     return;
   }
 
+  var tempIdeal = valorODefecto(document.getElementById("invTempIdealInput").value, 22);
+  var margenAtencion = valorODefecto(document.getElementById("invMargenAtencionInput").value, 3);
+  var margenCritico = valorODefecto(document.getElementById("invMargenCriticoInput").value, 6);
+
+  if (margenCritico <= margenAtencion) {
+    alert("El margen crítico tiene que ser más grande que el margen para avisar.");
+    return;
+  }
+
   var anterior = leerInvernadero();
   var nuevosDatos = {
     nombre: nombre,
     plantas: plantas,
-    fondo: fondoSeleccionadoInvernadero
+    fondo: fondoSeleccionadoInvernadero,
+    tempIdeal: tempIdeal,
+    margenAtencion: margenAtencion,
+    margenCritico: margenCritico
   };
 
   guardarInvernaderoEnStorage(nuevosDatos);
@@ -274,11 +297,15 @@ function mostrarInvernadero() {
   document.getElementById("invernaderoNombre").innerText = datos.nombre;
   document.getElementById("invernaderoPlantas").innerText = datos.plantas || "Sin plantas cargadas todavía.";
 
-  actualizarHorariosRiego();
   renderizarTipsPlantas(datos.plantas);
+  actualizarClimaInvernadero((typeof ultimoClimaMostrado !== "undefined" && ultimoClimaMostrado) ? ultimoClimaMostrado : {});
 
-  if (typeof ultimoClimaMostrado !== "undefined" && ultimoClimaMostrado) {
-    actualizarClimaInvernadero(ultimoClimaMostrado);
+  if (typeof ultimoSensor !== "undefined" && ultimoSensor && typeof evaluarEstadoPlanta === "function") {
+    evaluarEstadoPlanta(ultimoSensor.temperatura);
+  }
+
+  if (typeof consultarDatosInvernadero === "function") {
+    consultarDatosInvernadero();
   }
 
   if (typeof mostrarChatInvernadero === "function") {
@@ -397,14 +424,42 @@ function renderizarAlertas(alertas) {
   }
 }
 
+function hayDatosRealesDeLaPlaca() {
+  return typeof ultimoSensor !== "undefined" && ultimoSensor && !ultimoSensor.simulado;
+}
+
+function climaAdentro(clima) {
+  var copia = {};
+  for (var clave in clima) {
+    copia[clave] = clima[clave];
+  }
+
+  if (hayDatosRealesDeLaPlaca()) {
+    if (ultimoSensor.temperatura !== null) {
+      copia.temperatura = ultimoSensor.temperatura;
+    }
+    if (ultimoSensor.humedad !== null) {
+      copia.humedad = ultimoSensor.humedad;
+    }
+  }
+  return copia;
+}
+
+function climaParaRiego() {
+  var afuera = (typeof ultimoClimaMostrado !== "undefined" && ultimoClimaMostrado) ? ultimoClimaMostrado : {};
+  return climaAdentro(afuera);
+}
+
 function actualizarClimaInvernadero(clima) {
   setTextoSiExiste("invTemp", (clima.temperatura !== null && clima.temperatura !== undefined) ? Math.round(clima.temperatura) : "--");
   setTextoSiExiste("invHumedad", (clima.humedad !== null && clima.humedad !== undefined) ? Math.round(clima.humedad) : "--");
   setTextoSiExiste("invViento", (clima.viento !== null && clima.viento !== undefined) ? Math.round(clima.viento) : "--");
-  actualizarHorariosRiego(clima);
+
+  var adentro = climaAdentro(clima);
+  actualizarHorariosRiego(adentro);
   actualizarCieloInvernadero(clima);
   renderizarPronostico(clima.pronostico);
-  renderizarAlertas(generarAlertas(clima));
+  renderizarAlertas(generarAlertas(adentro));
 }
 
 function generarHorariosRiego(clima) {
@@ -442,7 +497,7 @@ function actualizarHorariosRiego(clima) {
     return;
   }
 
-  var datosClima = clima || (typeof ultimoClimaMostrado !== "undefined" ? ultimoClimaMostrado : null);
+  var datosClima = clima || climaParaRiego();
   var resultado = generarHorariosRiego(datosClima);
 
   caja.textContent = resultado.mensaje;
