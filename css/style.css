@@ -20,6 +20,7 @@
 
 /* ==========================================================
    1. VARIABLES (colores, bordes, sombras y fuente de toda la página)
+   te sibtutitule todo para q no te pierdas, suerte jajaj
    ========================================================== */
 
 :root {
@@ -354,6 +355,8 @@ ul {
 .map-leaflet {
   width: 100%;
   height: 320px;
+  position: relative;
+  z-index: 0;
 }
 
 /* ==========================================================
