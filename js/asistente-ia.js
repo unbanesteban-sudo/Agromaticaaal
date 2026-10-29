@@ -22,8 +22,8 @@ function contextoInvernadero() {
     texto += ", pero todavía no cargó qué plantas tiene.";
   }
 
-  if (typeof ultimoSensor !== "undefined" && ultimoSensor && !ultimoSensor.simulado) {
-    texto += " Los sensores del invernadero (placa ESP32) marcan ahora: " +
+  if (typeof sensorConectado !== "undefined" && sensorConectado && ultimoSensor) {
+    texto += " Los sensores del invernadero (servidor del profe) marcan ahora: " +
       (ultimoSensor.temperatura !== null ? ultimoSensor.temperatura.toFixed(1) + " °C" : "sin dato de temperatura") +
       (ultimoSensor.humedad !== null ? ", humedad " + Math.round(ultimoSensor.humedad) + "%" : "") +
       (ultimoSensor.luz !== null ? ", luminosidad " + Math.round(ultimoSensor.luz) : "") +

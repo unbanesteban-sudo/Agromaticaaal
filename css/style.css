@@ -883,7 +883,7 @@ ul {
   border-style: dashed;
 }
 
-/* ----- 8.12 Sensores de la placa del profe (adentro del invernadero) ----- */
+/* ----- 8.12 Datos del servidor del profe (adentro del invernadero) ----- */
 
 .sensores {
   padding: 18px 20px;
@@ -933,9 +933,9 @@ ul {
   color: #2f6b3a;
 }
 
-.sensor-simulado {
-  background: #fdf1e3;
-  color: #8a5a1f;
+.sensor-desconectado {
+  background: #fde2e2;
+  color: #b3261e;
 }
 
 .sensores-kpis {
@@ -978,12 +978,6 @@ ul {
 
 .kpi-nota.amarillo {
   color: #b7791f;
-}
-
-.kpi-grafico {
-  position: relative;
-  height: 70px;
-  margin-top: 6px;
 }
 
 .estado-planta {

@@ -1,23 +1,19 @@
 var SENSOR_CONFIG = {
   url: "http://192.168.4.1/",
   cadaMs: 3000,
-  esperaMaxMs: 2500,
-  maxPuntos: 9
+  esperaMaxMs: 2500
 };
 
-var IP_PLACA_KEY = "agromaticalIpPlaca";
+var IP_SERVIDOR_KEY = "agromaticalIpPlaca";
 
 var ultimoSensor = null;
+var sensorConectado = false;
 var consultandoSensor = false;
-var avisoSimulacionMostrado = false;
-
-var graficoTemperatura = null;
-var graficoHumedad = null;
-var graficoLuminosidad = null;
+var avisoSinConexionMostrado = false;
 
 function cargarIpGuardada() {
   try {
-    var guardada = localStorage.getItem(IP_PLACA_KEY);
+    var guardada = localStorage.getItem(IP_SERVIDOR_KEY);
     if (guardada) {
       SENSOR_CONFIG.url = guardada;
     }
@@ -26,9 +22,12 @@ function cargarIpGuardada() {
   }
 }
 
+function ipSinFormato() {
+  return SENSOR_CONFIG.url.replace("http://", "").replace(/\/+$/, "");
+}
+
 function cambiarIpPlaca() {
-  var actual = SENSOR_CONFIG.url.replace("http://", "").replace("/", "");
-  var nueva = prompt("Escribí la IP que muestra la pantallita OLED de la placa:", actual);
+  var nueva = prompt("Escribí la IP del servidor del profe:", ipSinFormato());
   if (!nueva) {
     return;
   }
@@ -36,81 +35,16 @@ function cambiarIpPlaca() {
   nueva = nueva.trim().replace("http://", "").replace(/\/+$/, "");
   SENSOR_CONFIG.url = "http://" + nueva + "/";
   try {
-    localStorage.setItem(IP_PLACA_KEY, SENSOR_CONFIG.url);
+    localStorage.setItem(IP_SERVIDOR_KEY, SENSOR_CONFIG.url);
   } catch (error) {
-    console.warn("[Agromatical] No se pudo guardar la IP de la placa.");
+    console.warn("[Agromatical] No se pudo guardar la IP del servidor.");
   }
   mostrarIpPlaca();
   consultarDatosInvernadero();
 }
 
 function mostrarIpPlaca() {
-  setTextoSiExiste("sensorIp", SENSOR_CONFIG.url.replace("http://", "").replace("/", ""));
-}
-
-function crearGrafico(idCanvas, colorLinea, colorRelleno) {
-  var canvas = document.getElementById(idCanvas);
-  if (!canvas || typeof Chart === "undefined") {
-    return null;
-  }
-
-  return new Chart(canvas.getContext("2d"), {
-    type: "line",
-    data: {
-      labels: [],
-      datasets: [{
-        data: [],
-        borderColor: colorLinea,
-        backgroundColor: colorRelleno,
-        borderWidth: 2,
-        pointRadius: 2,
-        fill: true,
-        tension: 0.3
-      }]
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      animation: false,
-      plugins: { legend: { display: false } },
-      scales: {
-        x: { display: false },
-        y: {
-          grid: { color: "rgba(31, 42, 28, 0.06)" },
-          ticks: { color: "#5f6b5a", font: { size: 10 }, maxTicksLimit: 4 }
-        }
-      }
-    }
-  });
-}
-
-function inicializarGraficos() {
-  if (typeof Chart === "undefined") {
-    console.warn("[Agromatical] No cargó Chart.js, se muestran los datos sin gráficos.");
-    return;
-  }
-  if (!graficoTemperatura) {
-    graficoTemperatura = crearGrafico("graficoTemperatura", "#e8590c", "rgba(232, 89, 12, 0.12)");
-  }
-  if (!graficoHumedad) {
-    graficoHumedad = crearGrafico("graficoHumedad", "#2b8fbf", "rgba(43, 143, 191, 0.12)");
-  }
-  if (!graficoLuminosidad) {
-    graficoLuminosidad = crearGrafico("graficoLuminosidad", "#7cc142", "rgba(124, 193, 66, 0.15)");
-  }
-}
-
-function agregarDatoGrafico(grafico, etiqueta, valor) {
-  if (!grafico || valor === null) {
-    return;
-  }
-  if (grafico.data.labels.length >= SENSOR_CONFIG.maxPuntos) {
-    grafico.data.labels.shift();
-    grafico.data.datasets[0].data.shift();
-  }
-  grafico.data.labels.push(etiqueta);
-  grafico.data.datasets[0].data.push(valor);
-  grafico.update();
+  setTextoSiExiste("sensorIp", ipSinFormato());
 }
 
 function numeroODefecto(valor, defecto) {
@@ -124,7 +58,15 @@ function evaluarEstadoPlanta(tempActual) {
   var mensaje = document.getElementById("estadoMensaje");
   var caja = document.getElementById("estadoPlanta");
 
-  if (!datos || !badge || !mensaje || !caja || tempActual === null) {
+  if (!datos || !badge || !mensaje || !caja) {
+    return;
+  }
+
+  if (!sensorConectado || tempActual === null || tempActual === undefined) {
+    caja.className = "estado-planta";
+    badge.textContent = "SIN DATOS";
+    mensaje.textContent = "No hay conexión con el servidor del profe (" + ipSinFormato() + "). Esa dirección solo funciona conectado a la red de la escuela.";
+    setTextoSiExiste("estadoRango", "");
     return;
   }
 
@@ -155,7 +97,10 @@ function actualizarNotaTemperatura(temperatura) {
   if (!nota) {
     return;
   }
-  if (temperatura >= 18 && temperatura <= 26) {
+  if (temperatura === null) {
+    nota.className = "kpi-nota";
+    nota.textContent = "";
+  } else if (temperatura >= 18 && temperatura <= 26) {
     nota.className = "kpi-nota verde";
     nota.textContent = "Rango óptimo (18 - 26 °C)";
   } else {
@@ -169,7 +114,10 @@ function actualizarNotaLuz(luz) {
   if (!nota) {
     return;
   }
-  if (luz < 50) {
+  if (luz === null) {
+    nota.className = "kpi-nota";
+    nota.textContent = "";
+  } else if (luz < 50) {
     nota.className = "kpi-nota amarillo";
     nota.textContent = "Luminosidad baja";
   } else {
@@ -178,51 +126,63 @@ function actualizarNotaLuz(luz) {
   }
 }
 
-function mostrarConexion(simulado) {
+function mostrarConexion() {
   var etiqueta = document.getElementById("sensorConexion");
   if (!etiqueta) {
     return;
   }
-  if (simulado) {
-    etiqueta.className = "sensor-conexion sensor-simulado";
-    etiqueta.textContent = "Simulación: no se encontró la placa";
-  } else {
+  if (sensorConectado) {
     etiqueta.className = "sensor-conexion sensor-conectado";
-    etiqueta.textContent = "Conectado a la placa";
+    etiqueta.textContent = "Conectado al servidor del profe";
+  } else {
+    etiqueta.className = "sensor-conexion sensor-desconectado";
+    etiqueta.textContent = "Sin conexión con el servidor del profe";
   }
 }
 
-function recibirDatosSensor(temperatura, humedad, luz, simulado) {
-  var hora = new Date().toLocaleTimeString("es-AR", { hour: "2-digit", minute: "2-digit", second: "2-digit" });
-
+function recibirDatosSensor(temperatura, humedad, luz) {
+  sensorConectado = true;
   ultimoSensor = {
     temperatura: temperatura,
     humedad: humedad,
     luz: luz,
-    simulado: simulado,
-    hora: hora
+    hora: new Date().toLocaleTimeString("es-AR", { hour: "2-digit", minute: "2-digit" })
   };
 
-  mostrarConexion(simulado);
+  mostrarConexion();
   setTextoSiExiste("sensorTemp", temperatura !== null ? temperatura.toFixed(1) : "--");
   setTextoSiExiste("sensorHum", humedad !== null ? Math.round(humedad) : "--");
   setTextoSiExiste("sensorLuz", luz !== null ? Math.round(luz) : "--");
-  setTextoSiExiste("sensorHora", hora);
+  setTextoSiExiste("sensorHora", ultimoSensor.hora);
 
-  if (temperatura !== null) {
-    actualizarNotaTemperatura(temperatura);
-    evaluarEstadoPlanta(temperatura);
+  actualizarNotaTemperatura(temperatura);
+  actualizarNotaLuz(luz);
+  evaluarEstadoPlanta(temperatura);
+
+  if (typeof actualizarClimaInvernadero === "function") {
+    actualizarClimaInvernadero(ultimoClimaMostrado || {});
   }
-  if (luz !== null) {
-    actualizarNotaLuz(luz);
+}
+
+function sinConexionConServidor(error) {
+  var estabaConectado = sensorConectado;
+  sensorConectado = false;
+
+  if (!avisoSinConexionMostrado) {
+    console.warn("[Agromatical] No se pudo conectar con el servidor del profe (" + SENSOR_CONFIG.url + "):", error);
+    avisoSinConexionMostrado = true;
   }
 
-  inicializarGraficos();
-  agregarDatoGrafico(graficoTemperatura, hora, temperatura);
-  agregarDatoGrafico(graficoHumedad, hora, humedad);
-  agregarDatoGrafico(graficoLuminosidad, hora, luz);
+  mostrarConexion();
+  evaluarEstadoPlanta(null);
 
-  if (!simulado && typeof actualizarClimaInvernadero === "function") {
+  if (!ultimoSensor) {
+    setTextoSiExiste("sensorTemp", "--");
+    setTextoSiExiste("sensorHum", "--");
+    setTextoSiExiste("sensorLuz", "--");
+  }
+
+  if (estabaConectado && typeof actualizarClimaInvernadero === "function") {
     actualizarClimaInvernadero(ultimoClimaMostrado || {});
   }
 }
@@ -235,14 +195,6 @@ function leerValor(datos, nombres) {
     }
   }
   return null;
-}
-
-function usarSimulacion(error) {
-  if (!avisoSimulacionMostrado) {
-    console.warn("[Agromatical] No se pudo conectar con la placa ESP32 (" + SENSOR_CONFIG.url + "), se usan datos simulados:", error);
-    avisoSimulacionMostrado = true;
-  }
-  recibirDatosSensor(20 + Math.random() * 8, 50 + Math.random() * 15, 40 + Math.random() * 20, true);
 }
 
 function consultarDatosInvernadero() {
@@ -263,18 +215,17 @@ function consultarDatosInvernadero() {
     .then(function (datos) {
       clearTimeout(timeoutId);
       consultandoSensor = false;
-      avisoSimulacionMostrado = false;
+      avisoSinConexionMostrado = false;
       recibirDatosSensor(
         leerValor(datos, ["temperatura", "temp"]),
         leerValor(datos, ["humedad", "hum"]),
-        leerValor(datos, ["luz", "luminosidad"]),
-        false
+        leerValor(datos, ["luz", "luminosidad"])
       );
     })
     .catch(function (error) {
       clearTimeout(timeoutId);
       consultandoSensor = false;
-      usarSimulacion(error);
+      sinConexionConServidor(error);
     });
 }
 

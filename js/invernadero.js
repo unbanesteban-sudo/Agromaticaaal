@@ -425,7 +425,7 @@ function renderizarAlertas(alertas) {
 }
 
 function hayDatosRealesDeLaPlaca() {
-  return typeof ultimoSensor !== "undefined" && ultimoSensor && !ultimoSensor.simulado;
+  return typeof sensorConectado !== "undefined" && sensorConectado && ultimoSensor;
 }
 
 function climaAdentro(clima) {

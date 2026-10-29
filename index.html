@@ -111,8 +111,8 @@
 
           <div class="sensores">
             <div class="sensores-top">
-              <h4 class="sensores-titulo">Adentro del invernadero <small>(sensores en vivo, cada 3 segundos)</small></h4>
-              <span class="sensor-conexion" id="sensorConexion">Buscando la placa...</span>
+              <h4 class="sensores-titulo">Adentro del invernadero <small>(datos del servidor del profe)</small></h4>
+              <span class="sensor-conexion" id="sensorConexion">Conectando con el servidor del profe...</span>
             </div>
 
             <div class="sensores-kpis">
@@ -120,31 +120,28 @@
                 <span class="kpi-nombre">Temperatura</span>
                 <strong><span id="sensorTemp">--</span> °C</strong>
                 <small class="kpi-nota" id="sensorTempNota"></small>
-                <div class="kpi-grafico"><canvas id="graficoTemperatura"></canvas></div>
               </div>
               <div class="kpi">
                 <span class="kpi-nombre">Humedad</span>
                 <strong><span id="sensorHum">--</span> %</strong>
                 <small class="kpi-nota">&nbsp;</small>
-                <div class="kpi-grafico"><canvas id="graficoHumedad"></canvas></div>
               </div>
               <div class="kpi">
                 <span class="kpi-nombre">Luminosidad</span>
                 <strong><span id="sensorLuz">--</span></strong>
                 <small class="kpi-nota" id="sensorLuzNota"></small>
-                <div class="kpi-grafico"><canvas id="graficoLuminosidad"></canvas></div>
               </div>
             </div>
 
             <div class="estado-planta" id="estadoPlanta">
               <span class="estado-badge" id="estadoBadge">--</span>
               <div>
-                <p id="estadoMensaje">Esperando datos de la placa...</p>
+                <p id="estadoMensaje">Esperando datos del servidor del profe...</p>
                 <small id="estadoRango"></small>
               </div>
             </div>
 
-            <p class="sensor-placa">Placa: <span id="sensorIp"></span> · Última lectura: <span id="sensorHora">--</span> · <button type="button" onclick="cambiarIpPlaca()">Cambiar IP</button></p>
+            <p class="sensor-placa">Servidor: <span id="sensorIp"></span> · Último dato: <span id="sensorHora">--</span> · <button type="button" onclick="cambiarIpPlaca()">Cambiar IP</button></p>
           </div>
 
           <h4 class="afuera-titulo">Afuera <small>(Open-Meteo)</small></h4>
@@ -392,7 +389,6 @@
   <script src="js/api.js"></script>
   <script src="js/weather-icons.js"></script>
   <script src="js/invernadero.js"></script>
-  <script src="js/lib/chart.umd.min.js"></script>
   <script src="js/sensores.js"></script>
   <script src="js/asistente-ia.js"></script>
   <script src="js/chat-invernadero.js"></script>
