@@ -5,8 +5,36 @@ var SYSTEM_PROMPT_BASE = "Sos AgrIA, el asistente de Agromatical, un sistema de 
   "específico del cultivo del usuario, lo aclarás en vez de inventar. Respondés " +
   "siempre en español.";
 
+function contextoInvernadero() {
+  if (typeof leerInvernadero !== "function") {
+    return "";
+  }
+
+  var datos = leerInvernadero();
+  if (!datos) {
+    return "";
+  }
+
+  var texto = " El usuario tiene un invernadero llamado \"" + datos.nombre + "\"";
+  if (datos.plantas) {
+    texto += " donde cultiva: " + datos.plantas + ".";
+  } else {
+    texto += ", pero todavía no cargó qué plantas tiene.";
+  }
+
+  if (typeof generarHorariosRiego === "function" && typeof ultimoClimaMostrado !== "undefined" && ultimoClimaMostrado) {
+    var riego = generarHorariosRiego(ultimoClimaMostrado);
+    texto += " El horario de riego que sugiere la página para hoy es: " +
+      (riego.horarios.length > 0 ? riego.horarios.join(" y ") : "no regar") +
+      " (" + riego.mensaje + ").";
+  }
+
+  texto += " Cuando te pregunte por sus plantas o su invernadero, usá estos datos y respondé pensando en esas plantas.";
+  return texto;
+}
+
 function construirSystemPrompt() {
-  var prompt = SYSTEM_PROMPT_BASE;
+  var prompt = SYSTEM_PROMPT_BASE + contextoInvernadero();
 
   if (typeof ultimoClimaMostrado !== "undefined" && ultimoClimaMostrado &&
       ultimoClimaMostrado.temperatura !== null && ultimoClimaMostrado.temperatura !== undefined) {

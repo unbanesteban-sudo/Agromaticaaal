@@ -128,6 +128,7 @@
             <h4 class="horarios-riego-titulo">Horario de riego sugerido para hoy</h4>
             <p class="consejo-riego" id="horariosRiegoMensaje">Cargando el horario de riego...</p>
             <div class="horarios-riego-lista" id="horariosRiegoLista"></div>
+            <button type="button" class="btn-planilla" onclick="descargarPlanillaRiego()">Descargar planilla de riego de la semana (Excel)</button>
           </div>
 
           <div class="invernadero-tips" id="invernaderoTipsBox" style="display:none;">
@@ -138,6 +139,29 @@
           <div class="invernadero-card-acciones">
             <button type="button" onclick="abrirModalInvernadero()">Editar</button>
             <button type="button" class="invernadero-btn-secundario" onclick="borrarInvernadero()">Eliminar</button>
+          </div>
+        </div>
+
+        <div class="chat-invernadero" id="chatInvernadero" style="display:none;">
+          <div class="chat-inv-header">
+            <img src="assets/logo-icono.png" alt="" class="chat-inv-avatar">
+            <div>
+              <strong>AgrIA</strong>
+              <span>Tu asistente para el invernadero</span>
+            </div>
+          </div>
+
+          <div class="chat-inv-mensajes" id="chatInvMensajes"></div>
+
+          <div class="chat-inv-rapidas">
+            <button type="button" onclick="preguntaRapidaChat('¿Cuándo tengo que regar hoy?')">¿Cuándo riego hoy?</button>
+            <button type="button" onclick="preguntaRapidaChat('¿Qué cuidados necesitan mis plantas?')">Cuidados de mis plantas</button>
+            <button type="button" onclick="preguntaRapidaChat('¿Hay riesgo de helada o de mucho calor estos días?')">¿Helada o calor?</button>
+          </div>
+
+          <div class="chat-inv-form">
+            <input type="text" id="chatInvInput" placeholder="Preguntale algo sobre tus plantas..." autocomplete="off" onkeypress="teclaChatInvernadero(event)">
+            <button type="button" onclick="enviarMensajeChatInvernadero()">Enviar</button>
           </div>
         </div>
       </div>
@@ -311,6 +335,9 @@
   <script src="js/weather-icons.js"></script>
   <script src="js/invernadero.js"></script>
   <script src="js/asistente-ia.js"></script>
+  <script src="js/chat-invernadero.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  <script src="js/planilla-riego.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
   <script src="js/mapa.js"></script>
   <script>

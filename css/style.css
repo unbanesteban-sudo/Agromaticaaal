@@ -695,7 +695,7 @@ ul {
 /* ----- 8.4 Horario de riego sugerido ----- */
 
 .horarios-riego {
-  padding: 0 20px 16px;
+  padding: 16px 20px;
 }
 
 .horarios-riego-titulo {
@@ -881,6 +881,166 @@ ul {
 
 .fondo-option-personalizada {
   border-style: dashed;
+}
+
+/* ----- 8.10 Botón para descargar la planilla de riego (Excel) ----- */
+
+.btn-planilla {
+  margin-top: 14px;
+  border: 2px solid var(--color-primary-light);
+  background: var(--color-surface);
+  color: var(--color-primary-dark);
+  font-family: var(--font-base);
+  font-weight: 700;
+  font-size: 0.88rem;
+  padding: 9px 16px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+}
+
+.btn-planilla::before {
+  content: "\2193  ";
+}
+
+.btn-planilla:hover {
+  background: var(--color-primary-soft);
+}
+
+/* ----- 8.11 Chat con AgrIA abajo del invernadero ----- */
+
+.chat-invernadero {
+  margin-top: 24px;
+  background: var(--color-surface);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.chat-inv-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 20px;
+  background: var(--fondo-campo);
+  color: #fff;
+}
+
+.chat-inv-header div {
+  display: flex;
+  flex-direction: column;
+}
+
+.chat-inv-header strong {
+  font-family: var(--font-titulos);
+  font-size: 1.05rem;
+}
+
+.chat-inv-header span {
+  font-size: 0.8rem;
+  opacity: 0.85;
+}
+
+.chat-inv-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 2px solid var(--color-primary-light);
+}
+
+.chat-inv-mensajes {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 18px 20px;
+  max-height: 380px;
+  overflow-y: auto;
+  background: var(--color-bg);
+}
+
+.chat-inv-msg {
+  max-width: 80%;
+  padding: 10px 14px;
+  border-radius: 14px;
+  font-size: 0.92rem;
+  line-height: 1.5;
+  white-space: pre-line;
+}
+
+.chat-inv-asistente {
+  align-self: flex-start;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-bottom-left-radius: 4px;
+}
+
+.chat-inv-usuario {
+  align-self: flex-end;
+  background: var(--color-primary-dark);
+  color: #fff;
+  border-bottom-right-radius: 4px;
+}
+
+.chat-inv-pensando {
+  align-self: flex-start;
+  color: var(--color-text-muted);
+  font-style: italic;
+  font-size: 0.85rem;
+}
+
+.chat-inv-rapidas {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 12px 20px 0;
+}
+
+.chat-inv-rapidas button {
+  border: 1px solid #b9d59a;
+  background: var(--color-primary-soft);
+  color: var(--color-primary-dark);
+  font-family: var(--font-base);
+  font-weight: 600;
+  font-size: 0.8rem;
+  padding: 6px 12px;
+  border-radius: 999px;
+  cursor: pointer;
+}
+
+.chat-inv-rapidas button:hover {
+  background: #dcedc8;
+}
+
+.chat-inv-form {
+  display: flex;
+  gap: 8px;
+  padding: 12px 20px 18px;
+}
+
+.chat-inv-form input {
+  flex: 1;
+  min-width: 0;
+  border: 1px solid var(--color-border);
+  border-radius: 999px;
+  padding: 10px 16px;
+  font-family: var(--font-base);
+  font-size: 0.92rem;
+}
+
+.chat-inv-form button {
+  border: none;
+  background: var(--color-accent);
+  color: #fff;
+  font-family: var(--font-base);
+  font-weight: 700;
+  padding: 0 20px;
+  border-radius: 999px;
+  cursor: pointer;
+}
+
+.chat-inv-form button:hover {
+  background: var(--color-primary-light);
 }
 
 /* ==========================================================

@@ -219,11 +219,21 @@ function guardarInvernadero() {
     return;
   }
 
-  guardarInvernaderoEnStorage({
+  var anterior = leerInvernadero();
+  var nuevosDatos = {
     nombre: nombre,
     plantas: plantas,
     fondo: fondoSeleccionadoInvernadero
-  });
+  };
+
+  guardarInvernaderoEnStorage(nuevosDatos);
+
+  if (!anterior && typeof borrarChatInvernadero === "function") {
+    borrarChatInvernadero();
+  }
+  if (anterior && anterior.plantas !== plantas && typeof avisarCambioDePlantas === "function") {
+    avisarCambioDePlantas(nuevosDatos);
+  }
 
   cerrarModalInvernadero();
   mostrarInvernadero();
@@ -231,6 +241,9 @@ function guardarInvernadero() {
 
 function borrarInvernadero() {
   localStorage.removeItem(INVERNADERO_STORAGE_KEY);
+  if (typeof borrarChatInvernadero === "function") {
+    borrarChatInvernadero();
+  }
   mostrarInvernadero();
 }
 
@@ -243,9 +256,14 @@ function mostrarInvernadero() {
     return;
   }
 
+  var chat = document.getElementById("chatInvernadero");
+
   if (!datos) {
     cta.style.display = "";
     card.style.display = "none";
+    if (chat) {
+      chat.style.display = "none";
+    }
     return;
   }
 
@@ -261,6 +279,10 @@ function mostrarInvernadero() {
 
   if (typeof ultimoClimaMostrado !== "undefined" && ultimoClimaMostrado) {
     actualizarClimaInvernadero(ultimoClimaMostrado);
+  }
+
+  if (typeof mostrarChatInvernadero === "function") {
+    mostrarChatInvernadero(datos);
   }
 }
 
