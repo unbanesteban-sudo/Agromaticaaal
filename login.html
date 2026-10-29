@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Entrar — Agromatical</title>
+  <link rel="icon" href="assets/favicon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;800&family=Nunito+Sans:wght@400;600;700&display=swap">
+  <link rel="stylesheet" href="css/style.css">
+  <script src="https://www.gstatic.com/firebasejs/12.19.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/12.19.0/firebase-auth-compat.js"></script>
+  <script src="js/firebase-config.js"></script>
+  <script src="js/auth.js"></script>
+</head>
+<body class="login-body">
+
+  <div class="login-layout">
+    <div class="login-lado-logo"></div>
+
+    <div class="login-lado-form">
+      <div class="login-card">
+        <img src="assets/logo-icono.png" alt="" class="login-logo-chico">
+        <h1>Bienvenido a Agromatical</h1>
+        <p class="login-sub">Entrá para cuidar tu invernadero.</p>
+
+        <div class="login-tabs">
+          <button type="button" id="tabEntrar" class="activo" onclick="cambiarModoLogin('entrar')">Iniciar sesión</button>
+          <button type="button" id="tabCrear" onclick="cambiarModoLogin('crear')">Crear cuenta</button>
+        </div>
+
+        <div class="form-field" id="campoNombre" style="display:none;">
+          <label for="loginNombre">Tu nombre</label>
+          <input type="text" id="loginNombre" placeholder="Ej: Esteban" autocomplete="name">
+        </div>
+
+        <div class="form-field">
+          <label for="loginMail">Mail</label>
+          <input type="email" id="loginMail" placeholder="tumail@gmail.com" autocomplete="email">
+        </div>
+
+        <div class="form-field">
+          <label for="loginClave">Contraseña</label>
+          <input type="password" id="loginClave" placeholder="Mínimo 6 caracteres" autocomplete="current-password" onkeypress="teclaLogin(event)">
+        </div>
+
+        <p class="login-mensaje" id="loginMensaje"></p>
+
+        <button type="button" class="login-btn" id="loginBoton" onclick="enviarLogin()">Iniciar sesión</button>
+
+        <div class="login-separador">o</div>
+
+        <button type="button" class="login-btn-invitado" onclick="entrarComoInvitado()">Entrar como invitado</button>
+
+        <p class="login-olvide"><button type="button" onclick="recuperarClave()">¿Te olvidaste la contraseña?</button></p>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/login.js"></script>
+</body>
+</html>

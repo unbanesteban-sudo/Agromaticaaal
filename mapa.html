@@ -4,21 +4,24 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Mapa Agromatical</title>
+  <link rel="icon" href="assets/favicon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;800&family=Nunito+Sans:wght@400;600;700&display=swap">
   <link rel="stylesheet" href="css/style.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+  <script src="https://www.gstatic.com/firebasejs/12.19.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/12.19.0/firebase-auth-compat.js"></script>
+  <script src="js/firebase-config.js"></script>
+  <script src="js/auth.js"></script>
 </head>
 <body>
 
   <header class="site-header">
     <div class="container header-bar">
       <a href="index.html" class="brand">
-        <span class="brand-icon" aria-hidden="true">
-          <svg width="30" height="30" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <circle cx="8" cy="8" r="4" fill="currentColor" opacity="0.85"/>
-            <path d="M7 17a4 4 0 0 1 0-8 5.5 5.5 0 0 1 10.8 1.2A3.7 3.7 0 0 1 17 17H7Z" fill="currentColor"/>
-          </svg>
-        </span>
-        <span class="brand-name">Agromatical</span>
+        <img src="assets/logo-icono.png" alt="" class="brand-logo">
+        <span class="brand-name">Agromatic<span>al</span></span>
       </a>
 
       <button type="button" class="nav-toggle" onclick="toggleMenu()" aria-label="Abrir menú">
@@ -34,6 +37,8 @@
           <li><a href="contacto.html">Contacto</a></li>
         </ul>
       </nav>
+
+      <div class="user-box" id="userBox"></div>
     </div>
   </header>
 
@@ -60,15 +65,10 @@
   <footer class="site-footer">
     <div class="container footer-top">
       <div class="footer-brand">
-        <span class="brand-icon" aria-hidden="true">
-          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <circle cx="8" cy="8" r="4" fill="currentColor" opacity="0.85"/>
-            <path d="M7 17a4 4 0 0 1 0-8 5.5 5.5 0 0 1 10.8 1.2A3.7 3.7 0 0 1 17 17H7Z" fill="currentColor"/>
-          </svg>
-        </span>
-        <span class="brand-name">Agromatical</span>
+        <img src="assets/logo-icono.png" alt="" class="brand-logo">
+        <span class="brand-name">Agromatic<span>al</span></span>
       </div>
-      <p class="footer-tagline">Proyecto académico de pronóstico del tiempo.</p>
+      <p class="footer-tagline">Tecnología que cultiva el futuro</p>
     </div>
 
     <div class="container footer-grid">
@@ -96,7 +96,7 @@
     </div>
 
     <div class="container footer-bottom">
-      <p>&copy; <span id="footerYear"></span> Agromatical — Trabajo práctico universitario.</p>
+      <p>&copy; <span id="footerYear"></span> Agromatical — Agromática Ada Lovelace</p>
     </div>
   </footer>
 
